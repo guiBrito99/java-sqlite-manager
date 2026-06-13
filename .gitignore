@@ -1,1 +1,24 @@
-/target/
+# Maven compiled output
+target/
+
+# Eclipse IDE specific files
+.settings/
+.project
+.classpath
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# ---------------------------------------------------
+# Database Files
+# ---------------------------------------------------
+# Ignore all standard SQLite extensions
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore your specific database file if it has no extension
+src.database
