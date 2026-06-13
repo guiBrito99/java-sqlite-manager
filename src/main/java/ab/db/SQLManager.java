@@ -131,8 +131,10 @@ public class SQLManager {
 
 		String[] allColumns = new String[1 + (columns == null ? 0 : columns.length)];
 		allColumns[0] = "id";
-		for (int i = 0; i < columns.length; i++)
-			allColumns[i + 1] = columns[i];
+
+		if (columns != null)
+			for (int i = 0; i < columns.length; i++)
+				allColumns[i + 1] = columns[i];
 
 		// Adding the desired table to the ArrayList representation of tables
 		this.tables.add(new Table(tableName, allColumns));
