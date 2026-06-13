@@ -255,7 +255,7 @@ public class SQLManager {
 
 			try {
 				selection = this.scanner.nextInt();
-				valid = selection < 0 || selection >= this.tables.size();
+				valid = selection >= 0 && selection < this.tables.size();
 			} catch (Exception e) {
 				System.out.println("Type in valid integer");
 				valid = false;
@@ -265,6 +265,8 @@ public class SQLManager {
 				System.out.println("Selected table: " + tables.get(selection).getName());
 				System.out.println("Confirm y/n");
 			}
+			
+			this.scanner.nextLine();
 
 		} while (!valid || this.scanner.nextLine().charAt(0) != 'y');
 
