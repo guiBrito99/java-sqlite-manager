@@ -2,9 +2,11 @@
 	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<groupId>com.ab</groupId>
 	<artifactId>database</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.xerial</groupId>
@@ -17,4 +19,24 @@
 			<version>1.2.13</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<executable>java</executable>
+					<arguments>
+						<argument>--enable-native-access=ALL-UNNAMED</argument>
+						<argument>-classpath</argument>
+						<classpath />
+						<argument>com.ab.Main</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
