@@ -116,7 +116,7 @@ public class SQLManager {
 		// Adding the table to the data base
 		String sql = "CREATE TABLE IF NOT EXISTS " + tableName;
 
-		sql += " (id INTEGER PRIMARY KEY AUTOINCREMENT" + columns[0];
+		sql += " (id INTEGER PRIMARY KEY AUTOINCREMENT, " + columns[0];
 
 		for (int i = 1; i < columns.length; i++)
 			sql += ", " + columns[i];
