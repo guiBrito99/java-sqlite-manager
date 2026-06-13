@@ -38,18 +38,17 @@ public class SQLManager {
 		}
 
 		// Retrieving all columns names for each table
-		ArrayList<String[]> columnsArrayList = new ArrayList<>();
 		for (int i = 0; i < tableNames.size(); i++) {
 			// Fetching columns
 			ResultSet columnsFetch = metaData.getColumns(null, null, tableNames.get(i), null);
 			int numberOfColumns = columnsFetch.getFetchSize();
-			columnsArrayList.add(new String[numberOfColumns]);
+			columnsArrays.add(new String[numberOfColumns]);
 
 			// Adding each column in the structure
 			for (int j = 0; j < numberOfColumns; j++) {
 				columnsFetch.next();
 
-				columnsArrayList.get(i)[j] = columnsFetch.getString("COLUMN_NAME");
+				columnsArrays.get(i)[j] = columnsFetch.getString("COLUMN_NAME");
 			}
 
 		}
