@@ -129,7 +129,7 @@ public class SQLManager {
 
 		this.runSQL(sql);
 
-		String[] allColumns = new String[columns.length + 1];
+		String[] allColumns = new String[1 + (columns == null ? 0 : columns.length)];
 		allColumns[0] = "id";
 		for (int i = 0; i < columns.length; i++)
 			allColumns[i + 1] = columns[i];
