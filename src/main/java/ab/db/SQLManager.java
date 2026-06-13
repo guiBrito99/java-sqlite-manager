@@ -96,41 +96,46 @@ public class SQLManager {
 		} while (tableName.isBlank() || this.scanner.nextLine().charAt(0) != 'y');
 
 		// Table columns creator
-		
+
 		String command;
 		do {
 			System.out.print("Table columns, separated by comma:");
 
 			command = this.scanner.nextLine();
-			
-			//This ensures the split command not passing a blank String[]
-			if(!command.isBlank())
+
+			// This ensures the split command not passing a blank String[]
+			if (!command.isBlank())
 				columns = command.split(",");
-			
+
 			System.out.println("Table columns: " + (columns != null ? Arrays.toString(columns) : ""));
 
 			/*
-			 To avoid confusion(columns array empty, returning directly to the beginning
-			 of the loop), only prints the confirm prompt if columns is valid
+			 * To avoid confusion(columns array empty, returning directly to the beginning
+			 * of the loop), only prints the confirm prompt if columns is valid
 			 */
 			System.out.print("Confirm y/n\n");
 		} while (this.scanner.nextLine().charAt(0) != 'y');
-
-		// Adding the desired table to the ArrayList representation of tables
-		this.tables.add(new Table(tableName, columns));
 
 		// Adding the table to the data base
 		String sql = "CREATE TABLE IF NOT EXISTS " + tableName;
 
 		sql += " (id INTEGER PRIMARY KEY AUTOINCREMENT";
 
-		if(columns != null)
+		if (columns != null)
 			for (int i = 0; i < columns.length; i++)
 				sql += ", " + columns[i];
 
 		sql += ")";
 
 		this.runSQL(sql);
+
+		String[] allColumns = new String[columns.length + 1];
+		allColumns[0] = "id";
+		for (int i = 0; i < columns.length; i++)
+			allColumns[i + 1] = columns[i];
+
+		// Adding the desired table to the ArrayList representation of tables
+		this.tables.add(new Table(tableName, allColumns));
 	}
 
 	public void deleteTable() {
