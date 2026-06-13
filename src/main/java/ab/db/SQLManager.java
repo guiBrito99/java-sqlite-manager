@@ -30,7 +30,7 @@ public class SQLManager {
 		// Retrieve database metadata
 		DatabaseMetaData metaData = this.connection.getMetaData();
 
-		ResultSet connectionTables = metaData.getTables(null, null, null, null);
+		ResultSet connectionTables = metaData.getTables(null, null, null, new String[] { "TABLE" });
 
 		// Retrieving all table names in the connection
 		while (connectionTables.next()) {
@@ -96,19 +96,25 @@ public class SQLManager {
 		} while (tableName.isBlank() || this.scanner.nextLine().charAt(0) != 'y');
 
 		// Table columns creator
+		
+		String command;
 		do {
 			System.out.print("Table columns, separated by comma:");
 
-			columns = this.scanner.nextLine().split(",");
-
-			System.out.println("Table columns: " + Arrays.toString(columns));
+			command = this.scanner.nextLine();
+			
+			//This ensures the split command not passing a blank String[]
+			if(!command.isBlank())
+				columns = command.split(",");
+			
+			System.out.println("Table columns: " + (columns != null ? Arrays.toString(columns) : ""));
 
 			/*
-			 * To avoid confusion(columns array empty, returning directly to the beginning
-			 * of the loop), only prints the confirm prompt if columns is valid
+			 To avoid confusion(columns array empty, returning directly to the beginning
+			 of the loop), only prints the confirm prompt if columns is valid
 			 */
-			System.out.print(columns != null ? "Confirm y/n\n" : "");
-		} while (columns == null || this.scanner.nextLine().charAt(0) != 'y');
+			System.out.print("Confirm y/n\n");
+		} while (this.scanner.nextLine().charAt(0) != 'y');
 
 		// Adding the desired table to the ArrayList representation of tables
 		this.tables.add(new Table(tableName, columns));
@@ -116,10 +122,11 @@ public class SQLManager {
 		// Adding the table to the data base
 		String sql = "CREATE TABLE IF NOT EXISTS " + tableName;
 
-		sql += " (id INTEGER PRIMARY KEY AUTOINCREMENT, " + columns[0];
+		sql += " (id INTEGER PRIMARY KEY AUTOINCREMENT";
 
-		for (int i = 1; i < columns.length; i++)
-			sql += ", " + columns[i];
+		if(columns != null)
+			for (int i = 0; i < columns.length; i++)
+				sql += ", " + columns[i];
 
 		sql += ")";
 
@@ -265,7 +272,7 @@ public class SQLManager {
 				System.out.println("Selected table: " + tables.get(selection).getName());
 				System.out.println("Confirm y/n");
 			}
-			
+
 			this.scanner.nextLine();
 
 		} while (!valid || this.scanner.nextLine().charAt(0) != 'y');
