@@ -134,119 +134,134 @@ public class SQLManager {
 	}
 
 	public void deleteTable() {
-		Table table = this.selectTable(this.tables, "Select table for deletion:");
+		if (!this.tables.isEmpty()) {
+			Table table = this.selectTable(this.tables, "Select table for deletion:");
 
-		// Deleting table from the database and on the controller
-		String sql = "DROP TABLE IF EXISTS " + table.getName();
+			// Deleting table from the database and on the controller
+			String sql = "DROP TABLE IF EXISTS " + table.getName();
 
-		this.tables.remove(table);
+			this.tables.remove(table);
 
-		this.runSQL(sql);
+			this.runSQL(sql);
+		} else
+			System.out.println("No table to delete");
 	}
 
 	public void insert() {
-		Table table = this.selectTable(this.tables, "Select table to insert");
-		String[] columns = this.selectColumns(table, "Select the column(s) for the insertion");
-		String[] values = this.selectValues(columns, "Select the value(s) for each column(s)");
+		if (!this.tables.isEmpty()) {
+			Table table = this.selectTable(this.tables, "Select table to insert");
+			String[] columns = this.selectColumns(table, "Select the column(s) for the insertion");
+			String[] values = this.selectValues(columns, "Select the value(s) for each column(s)");
 
-		// Updating internal table variable with values
-		table.getRows().add(values);
+			// Updating internal table variable with values
+			table.getRows().add(values);
 
-		// Inserting the value to the data base
-		String sql = "INSERT INTO " + table.getName() + "(";
+			// Inserting the value to the data base
+			String sql = "INSERT INTO " + table.getName() + "(";
 
-		for (String column : columns)
-			sql += column + ", ";
+			for (String column : columns)
+				sql += column + ", ";
 
-		sql = sql.substring(0, sql.length() - 2) + ") VALUES (";
+			sql = sql.substring(0, sql.length() - 2) + ") VALUES (";
 
-		for (String value : values)
-			sql += value + ", ";
+			for (String value : values)
+				sql += value + ", ";
 
-		sql = sql.substring(0, sql.length() - 2) + ")";
+			sql = sql.substring(0, sql.length() - 2) + ")";
 
-		this.runSQL(sql);
+			this.runSQL(sql);
+		} else
+			System.out.println("No table available for insertion");
 	}
 
 	public void update() {
-		Table table = this.selectTable(this.tables, "Select table to update");
-		int rowIndex = this.selectRow(table, "Select the row for the update");
-		String[] columns = this.selectColumns(table, "Select column(s) to update");
-		String[] values = this.selectValues(columns, "Select value(s) for each column(s)");
-		int rowId = Integer.valueOf(values[0]);
+		if (!this.tables.isEmpty()) {
+			Table table = this.selectTable(this.tables, "Select table to update");
+			int rowIndex = this.selectRow(table, "Select the row for the update");
+			String[] columns = this.selectColumns(table, "Select column(s) to update");
+			String[] values = this.selectValues(columns, "Select value(s) for each column(s)");
+			int rowId = Integer.valueOf(values[0]);
 
-		// Updating internal table structure
-		table.getRows().set(rowIndex, values);
+			// Updating internal table structure
+			table.getRows().set(rowIndex, values);
 
-		// Updating the values in the data base
-		String sql = "UPDATE " + table.getName() + " SET";
+			// Updating the values in the data base
+			String sql = "UPDATE " + table.getName() + " SET";
 
-		for (int i = 0; i < columns.length; i++) {
-			sql += " " + columns[i] + " = " + values[i] + ",";
-		}
+			for (int i = 0; i < columns.length; i++) {
+				sql += " " + columns[i] + " = " + values[i] + ",";
+			}
 
-		sql = sql.substring(0, sql.length() - 2);
+			sql = sql.substring(0, sql.length() - 2);
 
-		sql += " WHERE id = " + rowId;
+			sql += " WHERE id = " + rowId;
 
-		this.runSQL(sql);
+			this.runSQL(sql);
+		} else
+			System.out.println("No table available to update");
 	}
 
 	public void delete() {
-		Table table = this.selectTable(this.tables, "Select table to remove one row");
-		int rowIndex = this.selectRow(table, "Select the row to delete");
-		int rowId = Integer.valueOf(table.getRows().get(rowIndex)[0]);
-		// Updating internal table structure
-		table.getRows().remove(rowIndex);
+		if (!this.tables.isEmpty()) {
+			Table table = this.selectTable(this.tables, "Select table to remove one row");
+			int rowIndex = this.selectRow(table, "Select the row to delete");
+			int rowId = Integer.valueOf(table.getRows().get(rowIndex)[0]);
+			// Updating internal table structure
+			table.getRows().remove(rowIndex);
 
-		// Updating the data structure in the data base
-		String sql = "DELETE FROM " + table.getName() + " WHERE id = " + rowId;
+			// Updating the data structure in the data base
+			String sql = "DELETE FROM " + table.getName() + " WHERE id = " + rowId;
 
-		this.runSQL(sql);
+			this.runSQL(sql);
+		} else
+			System.out.println("No table available to delete row");
 	}
 
 	public void print() {
-		for (Table table : this.tables) {
-			System.out.println("### " + table.getName() + "\n");
+		if (!this.tables.isEmpty()) {
+			for (Table table : this.tables) {
+				System.out.println("### " + table.getName() + "\n");
 
-			String[] columns = table.getColumns();
-			ArrayList<String[]> rows = table.getRows();
+				String[] columns = table.getColumns();
+				ArrayList<String[]> rows = table.getRows();
 
-			// Calculate column widths (minimum = column header length)
-			int[] columnWidths = new int[columns.length];
-			for (int i = 0; i < columns.length; i++) {
-				columnWidths[i] = columns[i].length();
-			}
-			for (String[] values : rows) {
-				for (int i = 0; i < values.length; i++) {
-					if (values[i] != null && (values[i].length() > columnWidths[i])) {
-						columnWidths[i] = values[i].length();
+				// Calculate column widths (minimum = column header length)
+				int[] columnWidths = new int[columns.length];
+				for (int i = 0; i < columns.length; i++) {
+					columnWidths[i] = columns[i].length();
+				}
+				for (String[] values : rows) {
+					for (int i = 0; i < values.length; i++) {
+						if (values[i] != null && (values[i].length() > columnWidths[i])) {
+							columnWidths[i] = values[i].length();
+						}
 					}
 				}
-			}
 
-			// Build header row
-			String header = "|";
-			String separator = "|";
-			for (int i = 0; i < columns.length; i++) {
-				header += String.format(" %-" + columnWidths[i] + "s |", columns[i]);
-				separator += " " + "-".repeat(columnWidths[i]) + " |";
-			}
-			System.out.println(header);
-			System.out.println(separator);
-
-			// Build data rows
-			for (String[] row : rows) {
-				String line = "|";
+				// Build header row
+				String header = "|";
+				String separator = "|";
 				for (int i = 0; i < columns.length; i++) {
-					String cell = (i < row.length && row[i] != null) ? row[i] : "";
-					line += String.format(" %-" + columnWidths[i] + "s |", cell);
+					header += String.format(" %-" + columnWidths[i] + "s |", columns[i]);
+					separator += " " + "-".repeat(columnWidths[i]) + " |";
 				}
-				System.out.println(line);
-			}
+				System.out.println(header);
+				System.out.println(separator);
 
-			System.out.println();
-		}
+				// Build data rows
+				for (String[] row : rows) {
+					String line = "|";
+					for (int i = 0; i < columns.length; i++) {
+						String cell = (i < row.length && row[i] != null) ? row[i] : "";
+						line += String.format(" %-" + columnWidths[i] + "s |", cell);
+					}
+					System.out.println(line);
+				}
+
+				System.out.println();
+			}
+		} else
+			System.out.println("No table to print");
 	}
 
 	private Table selectTable(ArrayList<Table> tables, String message) {
