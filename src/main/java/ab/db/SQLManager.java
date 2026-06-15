@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Scanner;
 
 public class SQLManager {
@@ -165,7 +166,6 @@ public class SQLManager {
 				sql += "'" + value + "', ";
 
 			sql = sql.substring(0, sql.length() - 2) + ")";
-			System.out.println(sql);
 			this.runSQL(sql);
 		} else
 			System.out.println("No table available for insertion");
@@ -202,14 +202,14 @@ public class SQLManager {
 		if (!this.tables.isEmpty()) {
 			Table table = this.selectTable(this.tables, "Select table to remove one row");
 			int rowIndex = this.selectRow(table, "Select the row to delete");
-			int rowId = Integer.valueOf(table.getRows().get(rowIndex)[0]);
-			// Updating internal table structure
-			table.getRows().remove(rowIndex);
 
 			// Updating the data structure in the data base
-			String sql = "DELETE FROM " + table.getName() + " WHERE id = " + rowId;
+			String sql = "DELETE FROM " + table.getName() + " WHERE ";
 
 			this.runSQL(sql);
+
+			// Updating internal table structure
+			table.getRows().remove(rowIndex);
 		} else
 			System.out.println("No table available to delete row");
 	}
@@ -295,24 +295,31 @@ public class SQLManager {
 	private String[] selectColumns(Table table, String message) {
 		String[] availableColumns = table.getColumns(), selection = null, selectedColumns = null;
 		ArrayList<Integer> selectedIndexes = new ArrayList<>();
+		LinkedHashSet<Integer> indexSelection = new LinkedHashSet<>();
 
 		do {
 			System.out.println(message);
 
-			for (int i = 1; i < availableColumns.length; i++)
+			for (int i = 0; i < availableColumns.length; i++)
 				System.out.println(i + " - " + availableColumns[i]);
 
 			System.out.println(availableColumns.length + " - Select all columns");
 
 			selection = this.scanner.nextLine().split(",");
 
+			selectedIndexes.clear();
+			indexSelection.clear();
+
+			// Using LinkedHashSet so no duplicate values are stored
 			for (String string : selection)
 				try {
-					selectedIndexes.add(Integer.valueOf(string));
+					indexSelection.add(Integer.valueOf(string));
 				} catch (Exception e) {
 					System.out.println("Invalid integer, rejecting");
 				}
 
+			// Now adding all values to the ArrayList to perform modifications
+			selectedIndexes.addAll(indexSelection);
 			selectedIndexes.sort(Comparator.reverseOrder());
 
 			while (selectedIndexes.getFirst() > availableColumns.length) {
@@ -329,9 +336,7 @@ public class SQLManager {
 			for (int index : selectedIndexes)
 				selectionOutput += index + " ";
 
-			selectionOutput = selectionOutput.substring(0, selectionOutput.length() - 2);
-
-			System.out.println(selectionOutput);
+			System.out.println(selectionOutput.substring(0, selectionOutput.length() - 1));
 
 			System.out.println("Confirm y/n");
 
