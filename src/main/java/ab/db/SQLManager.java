@@ -66,7 +66,7 @@ public class SQLManager {
 			String[] values = new String[columnsArrays.get(i).length];
 			while (rowsFetch.next()) {
 				for (int j = 0; j < columnsArrays.get(i).length; j++) {
-					values[j] = rowsFetch.getString(j);
+					values[j] = rowsFetch.getString(j + 1);
 				}
 				rowsArrays.get(i).add(values);
 			}
@@ -125,7 +125,7 @@ public class SQLManager {
 		sql += ")";
 
 		this.runSQL(sql);
-		
+
 		// Adding the desired table to the ArrayList representation of tables
 		this.tables.add(new Table(tableName, columns));
 	}
@@ -165,7 +165,7 @@ public class SQLManager {
 				sql += "'" + value + "', ";
 
 			sql = sql.substring(0, sql.length() - 2) + ")";
-
+			System.out.println(sql);
 			this.runSQL(sql);
 		} else
 			System.out.println("No table available for insertion");
@@ -409,10 +409,10 @@ public class SQLManager {
 
 	private ResultSet runSQL(String sql) {
 		ResultSet resultSet = null;
-		try (Statement statement = this.connection.createStatement()) {
+		try {
+			Statement statement = this.connection.createStatement();
 			statement.execute(sql);
 			resultSet = statement.getResultSet();
-			System.out.println("SQL complete");
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}

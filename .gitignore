@@ -19,6 +19,3 @@ target/
 *.db
 *.sqlite
 *.sqlite3
-
-# Ignore your specific database file if it has no extension
-src.database
