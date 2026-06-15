@@ -125,14 +125,9 @@ public class SQLManager {
 		sql += ")";
 
 		this.runSQL(sql);
-
-		String[] allColumns = new String[columns.length + 1];
-
-		allColumns[0] = "id";
-		for (int i = 0; i < columns.length; i++)
-			allColumns[i + 1] = columns[i];
+		
 		// Adding the desired table to the ArrayList representation of tables
-		this.tables.add(new Table(tableName, allColumns));
+		this.tables.add(new Table(tableName, columns));
 	}
 
 	public void deleteTable() {
