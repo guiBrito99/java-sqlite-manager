@@ -23,6 +23,7 @@ public class SQLManager {
 	private void load() throws SQLException {
 		ArrayList<String> tableNames = new ArrayList<>();
 		ArrayList<String[]> columnsArrays = new ArrayList<>();
+		ArrayList<ArrayList<String[]>> rowsArrays = new ArrayList<>();
 
 		// Clearing all present data
 		this.tables.clear();
@@ -58,14 +59,13 @@ public class SQLManager {
 
 		// Retrieving all rows in each table
 		String sql = null;
-		ArrayList<ArrayList<String[]>> rowsArrays = new ArrayList<>();
 		for (int i = 0; i < tableNames.size(); i++) {
 			sql = "SELECT * FROM " + tableNames.get(i);
 			ResultSet rowsFetch = this.runSQL(sql);
 			rowsArrays.add(new ArrayList<>());
 			String[] values = new String[columnsArrays.get(i).length];
 			while (rowsFetch.next()) {
-				for (int j = 0; j < columnsArrays.get(i).length; i++) {
+				for (int j = 0; j < columnsArrays.get(i).length; j++) {
 					values[j] = rowsFetch.getString(j);
 				}
 				rowsArrays.get(i).add(values);
@@ -117,11 +117,10 @@ public class SQLManager {
 		// Adding the table to the data base
 		String sql = "CREATE TABLE IF NOT EXISTS " + tableName;
 
-		sql += " (id INTEGER PRIMARY KEY AUTOINCREMENT";
+		sql += " (" + columns[0];
 
-		if (columns != null)
-			for (int i = 0; i < columns.length; i++)
-				sql += "," + columns[i];
+		for (int i = 1; i < columns.length; i++)
+			sql += "," + columns[i];
 
 		sql += ")";
 
