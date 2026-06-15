@@ -168,7 +168,7 @@ public class SQLManager {
 			sql = sql.substring(0, sql.length() - 2) + ") VALUES(";
 
 			for (String value : values)
-				sql += "\"" + value + "\", ";
+				sql += "'" + value + "', ";
 
 			sql = sql.substring(0, sql.length() - 2) + ")";
 
