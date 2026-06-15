@@ -121,7 +121,7 @@ public class SQLManager {
 
 		if (columns != null)
 			for (int i = 0; i < columns.length; i++)
-				sql += ", " + columns[i];
+				sql += "," + columns[i];
 
 		sql += ")";
 
@@ -165,10 +165,10 @@ public class SQLManager {
 			for (String column : columns)
 				sql += column + ", ";
 
-			sql = sql.substring(0, sql.length() - 2) + ") VALUES (";
+			sql = sql.substring(0, sql.length() - 2) + ") VALUES(";
 
 			for (String value : values)
-				sql += value + ", ";
+				sql += "\"" + value + "\", ";
 
 			sql = sql.substring(0, sql.length() - 2) + ")";
 
