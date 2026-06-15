@@ -38,18 +38,21 @@ public class SQLManager {
 		}
 
 		// Retrieving all columns names for each table
+		ArrayList<String> fetchedColumns = new ArrayList<>();
 		for (int i = 0; i < tableNames.size(); i++) {
 			// Fetching columns
 			ResultSet columnsFetch = metaData.getColumns(null, null, tableNames.get(i), null);
-			int numberOfColumns = columnsFetch.getFetchSize();
-			columnsArrays.add(new String[numberOfColumns]);
 
 			// Adding each column in the structure
-			for (int j = 0; j < numberOfColumns; j++) {
-				columnsFetch.next();
-
-				columnsArrays.get(i)[j] = columnsFetch.getString("COLUMN_NAME");
+			while (columnsFetch.next()) {
+				fetchedColumns.add(columnsFetch.getString("COLUMN_NAME"));
 			}
+
+			columnsArrays.add(new String[fetchedColumns.size()]);
+
+			// Adding each column to the final data structure
+			for (int j = 0; j < fetchedColumns.size(); j++)
+				columnsArrays.get(i)[j] = fetchedColumns.get(j);
 
 		}
 
@@ -150,7 +153,7 @@ public class SQLManager {
 	public void insert() {
 		if (!this.tables.isEmpty()) {
 			Table table = this.selectTable(this.tables, "Select table to insert");
-			String[] columns = this.selectColumns(table, "Select the column(s) for the insertion");
+			String[] columns = this.selectColumns(table, "Select the column(s) for the insertion, separating by coma");
 			String[] values = this.selectValues(columns, "Select the value(s) for each column(s)");
 
 			// Updating internal table variable with values
@@ -178,7 +181,7 @@ public class SQLManager {
 		if (!this.tables.isEmpty()) {
 			Table table = this.selectTable(this.tables, "Select table to update");
 			int rowIndex = this.selectRow(table, "Select the row for the update");
-			String[] columns = this.selectColumns(table, "Select column(s) to update");
+			String[] columns = this.selectColumns(table, "Select column(s) to update, separating by coma");
 			String[] values = this.selectValues(columns, "Select value(s) for each column(s)");
 			int rowId = Integer.valueOf(values[0]);
 
