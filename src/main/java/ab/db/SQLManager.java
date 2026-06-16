@@ -178,8 +178,8 @@ public class SQLManager {
 			String[] columns = this.selectColumns(table, "Select column(s) to update, separating by coma");
 			String[] values = this.selectValues(columns, "Select value(s) for each column(s)");
 
-			// Updating internal table structure
-			table.getRows().set(rowIndex, values);
+			String[] oldColumns = table.getColumns();
+			String[] oldValues = table.getRows().get(rowIndex);
 
 			// Updating the values in the data base
 			String stringBuilding = "UPDATE " + table.getName() + " SET";
@@ -190,14 +190,15 @@ public class SQLManager {
 
 			stringBuilding = stringBuilding.substring(0, stringBuilding.length() - 1) + " WHERE ";
 
-			for (int i = 0; i < columns.length; i++)
-				stringBuilding += columns[i] + " = '" + values[i] + "' AND ";
+			for (int i = 0; i < oldColumns.length; i++)
+				stringBuilding += oldColumns[i] + " = '" + oldValues[i] + "' AND ";
 
 			String sql = stringBuilding.substring(0, stringBuilding.length() - 5);
 
-			System.out.println(sql);
-
 			this.runSQL(sql);
+
+			// Updating internal table structure
+			table.getRows().set(rowIndex, values);
 		} else
 			System.out.println("No table available to update");
 	}
