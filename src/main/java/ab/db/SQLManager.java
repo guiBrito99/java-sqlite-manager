@@ -177,21 +177,25 @@ public class SQLManager {
 			int rowIndex = this.selectRow(table, "Select the row for the update");
 			String[] columns = this.selectColumns(table, "Select column(s) to update, separating by coma");
 			String[] values = this.selectValues(columns, "Select value(s) for each column(s)");
-			int rowId = Integer.valueOf(values[0]);
 
 			// Updating internal table structure
 			table.getRows().set(rowIndex, values);
 
 			// Updating the values in the data base
-			String sql = "UPDATE " + table.getName() + " SET";
+			String stringBuilding = "UPDATE " + table.getName() + " SET";
 
 			for (int i = 0; i < columns.length; i++) {
-				sql += " " + columns[i] + " = " + values[i] + ",";
+				stringBuilding += " " + columns[i] + " = '" + values[i] + "',";
 			}
 
-			sql = sql.substring(0, sql.length() - 2);
+			stringBuilding = stringBuilding.substring(0, stringBuilding.length() - 1) + " WHERE ";
 
-			sql += " WHERE id = " + rowId;
+			for (int i = 0; i < columns.length; i++)
+				stringBuilding += columns[i] + " = '" + values[i] + "' AND ";
+
+			String sql = stringBuilding.substring(0, stringBuilding.length() - 5);
+
+			System.out.println(sql);
 
 			this.runSQL(sql);
 		} else
@@ -202,9 +206,16 @@ public class SQLManager {
 		if (!this.tables.isEmpty()) {
 			Table table = this.selectTable(this.tables, "Select table to remove one row");
 			int rowIndex = this.selectRow(table, "Select the row to delete");
+			String[] columns = table.getColumns();
+			String[] rowValues = table.getRows().get(rowIndex);
 
 			// Updating the data structure in the data base
-			String sql = "DELETE FROM " + table.getName() + " WHERE ";
+			String sqlBuilding = "DELETE FROM " + table.getName() + " WHERE ";
+
+			for (int i = 0; i < columns.length; i++)
+				sqlBuilding += columns[i] + " = '" + rowValues[i] + "' AND ";
+
+			String sql = sqlBuilding.substring(0, sqlBuilding.length() - 5);
 
 			this.runSQL(sql);
 
@@ -367,12 +378,13 @@ public class SQLManager {
 				for (int j = 0; j < rows.size(); j++)
 					rowString += "(" + columns[j] + ")" + rows.get(i)[j] + " ";
 
-				System.out.println(rowString.substring(0, rowString.length() - 2));
+				System.out.println(rowString.substring(0, rowString.length() - 1));
 			}
 
 			try {
 				row = this.scanner.nextInt();
-				valid = row < 0 || row >= rows.size();
+				this.scanner.nextLine();
+				valid = row >= 0 && row < rows.size();
 			} catch (Exception e) {
 				System.out.println("Type in valid integer");
 				valid = false;
@@ -381,10 +393,8 @@ public class SQLManager {
 			if (valid) {
 				System.out.println("Selected row:");
 
-				for (int i = 0; i < rows.size(); i++)
-					rowString += "(" + columns[i] + ")" + rows.get(row)[i] + " ";
-
-				System.out.println(rowString.substring(0, rowString.length() - 2));
+				System.out.println(rowString.substring(0, rowString.length() - 1));
+				System.out.println("Confirm y/n");
 			}
 
 		} while (!valid || this.scanner.nextLine().charAt(0) != 'y');
