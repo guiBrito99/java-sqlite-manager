@@ -245,7 +245,7 @@ public class TableManager {
 			String selectionOutput = "Selection: ";
 
 			for (int index : selectedIndexes)
-				selectionOutput += index + " ";
+				selectionOutput += availableColumns[index] + " ";
 
 			System.out.println(selectionOutput.substring(0, selectionOutput.length() - 1));
 
