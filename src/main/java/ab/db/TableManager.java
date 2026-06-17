@@ -291,7 +291,7 @@ public class TableManager {
 			System.out.println(message);
 			for (int i = 0; i < rows.size(); i++) {
 				rowString = i + " - ";
-				for (int j = 0; j < rows.size(); j++)
+				for (int j = 0; j < columns.length; j++)
 					rowString += "(" + columns[j] + ")" + rows.get(i)[j] + " ";
 
 				System.out.println(rowString.substring(0, rowString.length() - 1));

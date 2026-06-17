@@ -19,7 +19,7 @@ public class DataGateway {
 		ArrayList<String> tableNames = new ArrayList<>();
 		ArrayList<String[]> columnsArrays = new ArrayList<>();
 		ArrayList<ArrayList<String[]>> rowsArrays = new ArrayList<>();
-		
+
 		ArrayList<Table> tables = new ArrayList<>();
 
 		// Retrieve database metadata
@@ -33,8 +33,9 @@ public class DataGateway {
 		}
 
 		// Retrieving all columns names for each table
-		ArrayList<String> fetchedColumns = new ArrayList<>();
 		for (int i = 0; i < tableNames.size(); i++) {
+			ArrayList<String> fetchedColumns = new ArrayList<>();
+
 			// Fetching columns
 			ResultSet columnsFetch = metaData.getColumns(null, null, tableNames.get(i), null);
 
@@ -57,8 +58,8 @@ public class DataGateway {
 			sql = "SELECT * FROM " + tableNames.get(i);
 			ResultSet rowsFetch = this.runSQL(sql);
 			rowsArrays.add(new ArrayList<>());
-			String[] values = new String[columnsArrays.get(i).length];
 			while (rowsFetch.next()) {
+				String[] values = new String[columnsArrays.get(i).length];
 				for (int j = 0; j < columnsArrays.get(i).length; j++) {
 					values[j] = rowsFetch.getString(j + 1);
 				}
@@ -86,5 +87,5 @@ public class DataGateway {
 
 		return resultSet;
 	}
-	
+
 }
