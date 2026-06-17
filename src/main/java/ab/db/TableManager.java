@@ -187,6 +187,7 @@ public class TableManager {
 
 			try {
 				selection = this.scanner.nextInt();
+				this.scanner.nextLine();
 				valid = selection >= 0 && selection < this.tables.size();
 			} catch (Exception e) {
 				System.out.println("Type in valid integer");
