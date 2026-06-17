@@ -10,7 +10,11 @@ public class TableManager {
 	private Scanner scanner = new Scanner(System.in);
 	private ArrayList<Table> tables = new ArrayList<>();
 
-	public void createTable() {
+	public TableManager(ArrayList<Table> tables) {
+		this.tables = tables;
+	}
+
+	public Object[] createTable() {
 		String tableName = null;
 		String[] columns = null;
 
@@ -42,22 +46,31 @@ public class TableManager {
 
 		} while (command == "" || !this.inputValidation("Confirm y/n"));
 
-		// Adding table to internal data structure
-		this.tables.add(new Table(tableName, columns));
+		Table newTable = new Table(tableName, columns);
 
+		// Adding table to internal data structure
+		this.tables.add(newTable);
+
+		return new Object[] { newTable.getName(), newTable.getColumns() };
 	}
 
-	public void deleteTable() {
+	public String deleteTable() {
+		String tableName = null;
+
 		if (!this.tables.isEmpty()) {
 			Table table = this.selectTable("Select table for deletion:");
+			tableName = table.getName();
 			// Deleting selected table from the internal data structure
 			this.tables.remove(table);
 		} else
 			System.out.println("No table to delete");
 
+		return tableName;
 	}
 
-	public void insertRow() {
+	public Object[] insertRow() {
+
+		Object[] result = null;
 
 		if (!this.tables.isEmpty()) {
 			Table table = this.selectTable("Select table to insert");
@@ -67,11 +80,17 @@ public class TableManager {
 			// Updating internal table variable with values
 			table.getRows().add(values);
 
+			result = new Object[] { table.getName(), columns, values };
+
 		} else
 			System.out.println("No table available for insertion");
+
+		return result;
 	}
 
-	public void updateRow() {
+	public Object[] updateRow() {
+		Object[] result = null;
+
 		if (!this.tables.isEmpty()) {
 			Table table = this.selectTable("Select table to update");
 			int rowIndex = this.selectRow(table, "Select the row for the update");
@@ -83,21 +102,29 @@ public class TableManager {
 			// Updating internal table structure
 			table.getRows().set(rowIndex, values);
 
+			result = new Object[] { table.getName(), columns, values, oldValues };
+
 		} else
 			System.out.println("No table available to update");
+
+		return result;
 	}
 
-	public void deleteRows() {
+	public Object[] deleteRow() {
+		Object[] result = null;
+
 		if (!tables.isEmpty()) {
 			Table table = this.selectTable("Select table to remove one row");
 			int rowIndex = this.selectRow(table, "Select the row to delete");
-			String[] columns = table.getColumns();
-			String[] rowValues = table.getRows().get(rowIndex);
 
 			// Updating internal table structure
 			table.getRows().remove(rowIndex);
+
+			result = new Object[] { table, rowIndex };
 		} else
 			System.out.println("No table available to delete row");
+
+		return result;
 	}
 
 	public void printTables() {

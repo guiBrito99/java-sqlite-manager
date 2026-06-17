@@ -4,31 +4,31 @@ import java.util.ArrayList;
 
 public class SQLBuilder {
 
-	public static String createTableSQL(Table table) {
+	public static String createTableSQL(String tableName, String[] columns) {
 
-		String sql = "CREATE TABLE IF NOT EXISTS " + table.getName();
+		String sql = "CREATE TABLE IF NOT EXISTS " + tableName;
 
-		sql += " (" + table.getColumns()[0];
+		sql += " (" + columns[0];
 
-		for (int i = 1; i < table.getColumns().length; i++)
-			sql += "," + table.getColumns()[i];
+		for (int i = 1; i < columns.length; i++)
+			sql += "," + columns[i];
 
 		sql += ")";
 
 		return sql;
 	}
 
-	public static String deleteTable(Table table) {
-		return "DROP TABLE IF EXISTS " + table.getName();
+	public static String deleteTable(String tableName) {
+		return "DROP TABLE IF EXISTS " + tableName;
 	}
 
-	public static String insertRow(Table table, String[] values) {
+	public static String insertRow(String tableName, String[] columns, String[] values) {
 		String sql = null;
 
 		// Inserting the value to the data base
-		sql = "INSERT INTO " + table.getName() + "(";
+		sql = "INSERT INTO " + tableName + "(";
 
-		for (String column : table.getColumns())
+		for (String column : columns)
 			sql += column + ", ";
 
 		sql = sql.substring(0, sql.length() - 2) + ") VALUES(";
@@ -41,11 +41,11 @@ public class SQLBuilder {
 		return sql;
 	}
 
-	public static String updateRow(Table table, String[] columns, String[] values, String[] oldValues) {
+	public static String updateRow(String tableName, String[] columns, String[] values, String[] oldValues) {
 		String sql = null;
 
 		// Updating the values in the data base
-		String stringBuilding = "UPDATE " + table.getName() + " SET";
+		String stringBuilding = "UPDATE " + tableName + " SET";
 
 		for (int i = 0; i < columns.length; i++) {
 			stringBuilding += " " + columns[i] + " = '" + values[i] + "',";

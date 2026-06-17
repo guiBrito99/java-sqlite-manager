@@ -3,7 +3,7 @@ package ab.db;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-public class Main {
+public class View {
 	static Scanner scanner = new Scanner(System.in);
 
 	public static void main(String... args) throws SQLException {
@@ -22,10 +22,10 @@ public class Main {
 				System.out.println("0 - Exit");
 
 				try {
-					command = Main.scanner.nextInt();
+					command = View.scanner.nextInt();
 				} catch (Exception e) {
 					System.out.println("Type in valid integer");
-					Main.scanner.next();
+					View.scanner.next();
 					command = -1;
 				}
 

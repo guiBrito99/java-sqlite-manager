@@ -9,21 +9,18 @@ import java.util.ArrayList;
 
 public class DataGateway {
 
-	private ArrayList<Table> tables = new ArrayList<>();
 	private Connection connection;
 
 	public DataGateway(Connection connection) throws SQLException {
 		this.connection = connection;
-		load();
 	}
 
-	private void load() throws SQLException {
+	public ArrayList<Table> load() throws SQLException {
 		ArrayList<String> tableNames = new ArrayList<>();
 		ArrayList<String[]> columnsArrays = new ArrayList<>();
 		ArrayList<ArrayList<String[]>> rowsArrays = new ArrayList<>();
-
-		// Clearing all present data
-		this.tables.clear();
+		
+		ArrayList<Table> tables = new ArrayList<>();
 
 		// Retrieve database metadata
 		DatabaseMetaData metaData = this.connection.getMetaData();
@@ -71,9 +68,10 @@ public class DataGateway {
 
 		// Adding the tables to the internal structure
 		for (int i = 0; i < tableNames.size(); i++) {
-			this.tables.add(new Table(tableNames.get(i), columnsArrays.get(i), rowsArrays.get(i)));
+			tables.add(new Table(tableNames.get(i), columnsArrays.get(i), rowsArrays.get(i)));
 		}
 
+		return tables;
 	}
 
 	public ResultSet runSQL(String sql) {
@@ -88,4 +86,5 @@ public class DataGateway {
 
 		return resultSet;
 	}
+	
 }
