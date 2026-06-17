@@ -333,6 +333,8 @@ public class TableManager {
 
 		} while (command == "" || (firstChar != 'y' && firstChar != 'n'));
 
+		confirm = firstChar == 'y';
+
 		return confirm;
 	}
 }
