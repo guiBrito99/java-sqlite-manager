@@ -32,7 +32,7 @@
 						<argument>--enable-native-access=ALL-UNNAMED</argument>
 						<argument>-classpath</argument>
 						<classpath />
-						<argument>ab.db.Main</argument>
+						<argument>ab.db.View</argument>
 					</arguments>
 				</configuration>
 			</plugin>
