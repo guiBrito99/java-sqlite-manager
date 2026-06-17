@@ -1,6 +1,5 @@
 package ab.db;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -8,10 +7,6 @@ public class Main {
 	static Scanner scanner = new Scanner(System.in);
 
 	public static void main(String... args) throws SQLException {
-
-		Connection connection = ConnectionManager.connect();
-
-		SQLManager sqlManager = new SQLManager(connection);
 
 		if (args.length == 0) {
 			int command;
@@ -36,22 +31,16 @@ public class Main {
 
 				switch (command) {
 				case 1:
-					sqlManager.print();
 					break;
 				case 2:
-					sqlManager.createTable();
 					break;
 				case 3:
-					sqlManager.deleteTable();
 					break;
 				case 4:
-					sqlManager.insert();
 					break;
 				case 5:
-					sqlManager.delete();
 					break;
 				case 6:
-					sqlManager.update();
 					break;
 				default:
 				}

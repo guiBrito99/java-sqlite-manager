@@ -12,7 +12,7 @@ public class Table {
 		this.columns = columns;
 		this.rows = rows;
 	}
-	
+
 	public Table(String name, String[] columns) {
 		this(name, columns, new ArrayList<>());
 	}

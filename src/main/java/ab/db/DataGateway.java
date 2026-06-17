@@ -7,12 +7,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class DBLoader {
+public class DataGateway {
 
 	private ArrayList<Table> tables = new ArrayList<>();
 	private Connection connection;
 
-	public DBLoader(Connection connection) throws SQLException {
+	public DataGateway(Connection connection) throws SQLException {
 		this.connection = connection;
 		load();
 	}
@@ -76,7 +76,7 @@ public class DBLoader {
 
 	}
 
-	private ResultSet runSQL(String sql) {
+	public ResultSet runSQL(String sql) {
 		ResultSet resultSet = null;
 		try {
 			Statement statement = this.connection.createStatement();

@@ -1,0 +1,80 @@
+package ab.db;
+
+import java.util.ArrayList;
+
+public class SQLBuilder {
+
+	public static String createTableSQL(Table table) {
+
+		String sql = "CREATE TABLE IF NOT EXISTS " + table.getName();
+
+		sql += " (" + table.getColumns()[0];
+
+		for (int i = 1; i < table.getColumns().length; i++)
+			sql += "," + table.getColumns()[i];
+
+		sql += ")";
+
+		return sql;
+	}
+
+	public static String deleteTable(Table table) {
+		return "DROP TABLE IF EXISTS " + table.getName();
+	}
+
+	public static String insertRow(Table table, String[] values) {
+		String sql = null;
+
+		// Inserting the value to the data base
+		sql = "INSERT INTO " + table.getName() + "(";
+
+		for (String column : table.getColumns())
+			sql += column + ", ";
+
+		sql = sql.substring(0, sql.length() - 2) + ") VALUES(";
+
+		for (String value : values)
+			sql += "'" + value + "', ";
+
+		sql = sql.substring(0, sql.length() - 2) + ")";
+
+		return sql;
+	}
+
+	public static String updateRow(Table table, String[] columns, String[] values, String[] oldValues) {
+		String sql = null;
+
+		// Updating the values in the data base
+		String stringBuilding = "UPDATE " + table.getName() + " SET";
+
+		for (int i = 0; i < columns.length; i++) {
+			stringBuilding += " " + columns[i] + " = '" + values[i] + "',";
+		}
+
+		stringBuilding = stringBuilding.substring(0, stringBuilding.length() - 1) + " WHERE ";
+
+		for (int i = 0; i < columns.length; i++)
+			stringBuilding += columns[i] + " = '" + oldValues[i] + "' AND ";
+
+		sql = stringBuilding.substring(0, stringBuilding.length() - 5);
+
+		return sql;
+	}
+
+	public static String deleteRow(Table table, int rowIndex) {
+		String sql = null;
+		String[] columns = table.getColumns();
+		ArrayList<String[]> values = table.getRows();
+
+		// Updating the data structure in the data base
+		String sqlBuilding = "DELETE FROM " + table.getName() + " WHERE ";
+
+		for (int i = 0; i < columns.length; i++)
+			sqlBuilding += columns[i] + " = '" + values.get(rowIndex)[i] + "' AND ";
+
+		sql = sqlBuilding.substring(0, sqlBuilding.length() - 5);
+
+		return sql;
+	}
+
+}
