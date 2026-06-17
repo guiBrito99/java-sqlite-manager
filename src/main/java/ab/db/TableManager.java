@@ -284,11 +284,11 @@ public class TableManager {
 		int row = -1;
 		String[] columns = table.getColumns();
 		ArrayList<String[]> rows = table.getRows();
-		String rowString = null;
 		boolean valid = false;
 
 		do {
 			System.out.println(message);
+			String rowString = null;
 			for (int i = 0; i < rows.size(); i++) {
 				rowString = i + " - ";
 				for (int j = 0; j < columns.length; j++)
@@ -308,6 +308,10 @@ public class TableManager {
 
 			if (valid) {
 				System.out.println("Selected row:");
+
+				rowString = row + " - ";
+				for (int j = 0; j < columns.length; j++)
+					rowString += "(" + columns[j] + ")" + rows.get(row)[j] + " ";
 
 				System.out.println(rowString.substring(0, rowString.length() - 1));
 			}
