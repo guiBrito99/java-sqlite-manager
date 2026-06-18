@@ -4,16 +4,16 @@ import java.util.ArrayList;
 
 public class Table {
 	private String name;
-	private String[] columns;
+	private ArrayList<String> columns;
 	private ArrayList<String[]> rows;
 
-	public Table(String name, String[] columns, ArrayList<String[]> rows) {
+	public Table(String name, ArrayList<String> columns, ArrayList<String[]> rows) {
 		this.name = name;
 		this.columns = columns;
 		this.rows = rows;
 	}
 
-	public Table(String name, String[] columns) {
+	public Table(String name, ArrayList<String> columns) {
 		this(name, columns, new ArrayList<>());
 	}
 
@@ -21,7 +21,7 @@ public class Table {
 		return this.name;
 	}
 
-	public String[] getColumns() {
+	public ArrayList<String> getColumns() {
 		return this.columns;
 	}
 

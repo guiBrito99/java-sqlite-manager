@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Scanner;
 
 public class TableManager {
@@ -17,6 +18,7 @@ public class TableManager {
 	public Object[] createTable() {
 		String tableName = null;
 		String[] columns = null;
+		ArrayList<String> columnsArrayList = null;
 
 		// Table name creator
 		do {
@@ -41,17 +43,20 @@ public class TableManager {
 
 			if (command != "") {
 				columns = command.split(",");
+
+				columnsArrayList = new ArrayList<>(List.of(columns));
+
 				System.out.println("Columns: " + Arrays.toString(columns));
 			}
 
 		} while (command == "" || !this.inputValidation("Confirm y/n"));
 
-		Table newTable = new Table(tableName, columns);
+		Table newTable = new Table(tableName, columnsArrayList);
 
 		// Adding table to internal data structure
 		this.tables.add(newTable);
 
-		return new Object[] { newTable.getName(), newTable.getColumns() };
+		return new Object[] { newTable.getName(), columns };
 	}
 
 	public String deleteTable() {
@@ -78,7 +83,13 @@ public class TableManager {
 			String[] values = this.selectValues(columns, "Select the value(s) for each column(s)");
 
 			// Updating internal table variable with values
-			table.getRows().add(values);
+			ArrayList<String> tableColumns = table.getColumns();
+			ArrayList<String[]> tableRows = table.getRows();
+			tableRows.add(new String[tableColumns.size()]);
+			for (int i = 0; i < columns.length; i++) {
+				int internalIndex = tableColumns.indexOf(columns[i]);
+				tableRows.getLast()[internalIndex] = values[i];
+			}
 
 			result = new Object[] { table.getName(), columns, values };
 
@@ -97,12 +108,18 @@ public class TableManager {
 			String[] columns = this.selectColumns(table, "Select column(s) to update, separating by coma");
 			String[] values = this.selectValues(columns, "Select value(s) for each column(s)");
 
-			String[] oldValues = table.getRows().get(rowIndex);
+			String[] oldValues = Arrays.copyOf(table.getRows().get(rowIndex), table.getRows().get(rowIndex).length);
 
 			// Updating internal table structure
-			table.getRows().set(rowIndex, values);
+			ArrayList<String> tableColumns = table.getColumns();
+			String[] tableValues = table.getRows().get(rowIndex);
+			for (int i = 0; i < columns.length; i++) {
+				int internalIndex = tableColumns.indexOf(columns[i]);
+				tableValues[internalIndex] = values[i];
+			}
 
-			result = new Object[] { table.getName(), columns, values, oldValues };
+			result = new Object[] { table.getName(), columns, values,
+					tableColumns.toArray(new String[tableColumns.size()]), oldValues };
 
 		} else
 			System.out.println("No table available to update");
@@ -132,13 +149,13 @@ public class TableManager {
 			for (Table table : this.tables) {
 				System.out.println("### " + table.getName() + "\n");
 
-				String[] columns = table.getColumns();
+				ArrayList<String> columns = table.getColumns();
 				ArrayList<String[]> rows = table.getRows();
 
 				// Calculate column widths (minimum = column header length)
-				int[] columnWidths = new int[columns.length];
-				for (int i = 0; i < columns.length; i++) {
-					columnWidths[i] = columns[i].length();
+				int[] columnWidths = new int[columns.size()];
+				for (int i = 0; i < columns.size(); i++) {
+					columnWidths[i] = columns.get(i).length();
 				}
 				for (String[] values : rows) {
 					for (int i = 0; i < values.length; i++) {
@@ -151,8 +168,8 @@ public class TableManager {
 				// Build header row
 				String header = "|";
 				String separator = "|";
-				for (int i = 0; i < columns.length; i++) {
-					header += String.format(" %-" + columnWidths[i] + "s |", columns[i]);
+				for (int i = 0; i < columns.size(); i++) {
+					header += String.format(" %-" + columnWidths[i] + "s |", columns.get(i));
 					separator += " " + "-".repeat(columnWidths[i]) + " |";
 				}
 				System.out.println(header);
@@ -161,7 +178,7 @@ public class TableManager {
 				// Build data rows
 				for (String[] row : rows) {
 					String line = "|";
-					for (int i = 0; i < columns.length; i++) {
+					for (int i = 0; i < columns.size(); i++) {
 						String cell = (i < row.length && row[i] != null) ? row[i] : "";
 						line += String.format(" %-" + columnWidths[i] + "s |", cell);
 					}
@@ -204,17 +221,18 @@ public class TableManager {
 	}
 
 	private String[] selectColumns(Table table, String message) {
-		String[] availableColumns = table.getColumns(), selection = null, selectedColumns = null;
+		ArrayList<String> availableColumns = table.getColumns();
+		String[] selection = null, selectedColumns = null;
 		ArrayList<Integer> selectedIndexes = new ArrayList<>();
 		LinkedHashSet<Integer> indexSelection = new LinkedHashSet<>();
 
 		do {
 			System.out.println(message);
 
-			for (int i = 0; i < availableColumns.length; i++)
-				System.out.println(i + " - " + availableColumns[i]);
+			for (int i = 0; i < availableColumns.size(); i++)
+				System.out.println(i + " - " + availableColumns.get(i));
 
-			System.out.println(availableColumns.length + " - Select all columns");
+			System.out.println(availableColumns.size() + " - Select all columns");
 
 			selection = this.scanner.nextLine().split(",");
 
@@ -233,11 +251,11 @@ public class TableManager {
 			selectedIndexes.addAll(indexSelection);
 			selectedIndexes.sort(Comparator.reverseOrder());
 
-			while (selectedIndexes.getFirst() > availableColumns.length) {
+			while (selectedIndexes.getFirst() > availableColumns.size()) {
 				selectedIndexes.removeFirst();
 			}
 
-			if (selectedIndexes.getFirst() == availableColumns.length)
+			if (selectedIndexes.getFirst() == availableColumns.size())
 				selectedIndexes.subList(1, selectedIndexes.size()).clear();
 
 			selectedIndexes.sort(Comparator.naturalOrder());
@@ -245,18 +263,19 @@ public class TableManager {
 			String selectionOutput = "Selection: ";
 
 			for (int index : selectedIndexes)
-				selectionOutput += availableColumns.length == index ? "All columns " : availableColumns[index] + " ";
+				selectionOutput += availableColumns.size() == index ? "All columns "
+						: availableColumns.get(index) + " ";
 
 			System.out.println(selectionOutput.substring(0, selectionOutput.length() - 1));
 
 		} while (selectedIndexes.isEmpty() || !this.inputValidation("Confirm y/n"));
 
-		if (selectedIndexes.getFirst() == availableColumns.length)
-			selectedColumns = availableColumns;
+		if (selectedIndexes.getFirst() == availableColumns.size())
+			selectedColumns = availableColumns.toArray(new String[availableColumns.size()]);
 		else {
 			selectedColumns = new String[selectedIndexes.size()];
 			for (int i = 0; i < selectedIndexes.size(); i++)
-				selectedColumns[i] = availableColumns[selectedIndexes.get(i)];
+				selectedColumns[i] = availableColumns.get(selectedIndexes.get(i));
 		}
 
 		return selectedColumns;
@@ -282,7 +301,7 @@ public class TableManager {
 
 	private int selectRow(Table table, String message) {
 		int row = -1;
-		String[] columns = table.getColumns();
+		ArrayList<String> columns = table.getColumns();
 		ArrayList<String[]> rows = table.getRows();
 		boolean valid = false;
 
@@ -291,8 +310,8 @@ public class TableManager {
 			String rowString = null;
 			for (int i = 0; i < rows.size(); i++) {
 				rowString = i + " - ";
-				for (int j = 0; j < columns.length; j++)
-					rowString += "(" + columns[j] + ")" + rows.get(i)[j] + " ";
+				for (int j = 0; j < columns.size(); j++)
+					rowString += "(" + columns.get(j) + ")" + rows.get(i)[j] + " ";
 
 				System.out.println(rowString.substring(0, rowString.length() - 1));
 			}
@@ -310,8 +329,8 @@ public class TableManager {
 				System.out.println("Selected row:");
 
 				rowString = row + " - ";
-				for (int j = 0; j < columns.length; j++)
-					rowString += "(" + columns[j] + ")" + rows.get(row)[j] + " ";
+				for (int j = 0; j < columns.size(); j++)
+					rowString += "(" + columns.get(j) + ")" + rows.get(row)[j] + " ";
 
 				System.out.println(rowString.substring(0, rowString.length() - 1));
 			}

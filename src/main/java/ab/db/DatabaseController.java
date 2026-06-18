@@ -53,9 +53,10 @@ public class DatabaseController {
 			String tableName = (String) result[0];
 			String[] columns = (String[]) result[1];
 			String[] values = (String[]) result[2];
-			String[] oldValues = (String[]) result[3];
+			String[] tableColumns = (String[]) result[3];
+			String[] oldValues = (String[]) result[4];
 
-			String sql = SQLBuilder.updateRow(tableName, columns, values, oldValues);
+			String sql = SQLBuilder.updateRow(tableName, columns, values, tableColumns, oldValues);
 			this.dataGateway.runSQL(sql);
 		}
 	}

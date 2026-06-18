@@ -17,7 +17,7 @@ public class DataGateway {
 
 	public ArrayList<Table> load() throws SQLException {
 		ArrayList<String> tableNames = new ArrayList<>();
-		ArrayList<String[]> columnsArrays = new ArrayList<>();
+		ArrayList<ArrayList<String>> columnsArrays = new ArrayList<>();
 		ArrayList<ArrayList<String[]>> rowsArrays = new ArrayList<>();
 
 		ArrayList<Table> tables = new ArrayList<>();
@@ -44,11 +44,7 @@ public class DataGateway {
 				fetchedColumns.add(columnsFetch.getString("COLUMN_NAME"));
 			}
 
-			columnsArrays.add(new String[fetchedColumns.size()]);
-
-			// Adding each column to the final data structure
-			for (int j = 0; j < fetchedColumns.size(); j++)
-				columnsArrays.get(i)[j] = fetchedColumns.get(j);
+			columnsArrays.add(fetchedColumns);
 
 		}
 
@@ -59,8 +55,8 @@ public class DataGateway {
 			ResultSet rowsFetch = this.runSQL(sql);
 			rowsArrays.add(new ArrayList<>());
 			while (rowsFetch.next()) {
-				String[] values = new String[columnsArrays.get(i).length];
-				for (int j = 0; j < columnsArrays.get(i).length; j++) {
+				String[] values = new String[columnsArrays.get(i).size()];
+				for (int j = 0; j < columnsArrays.get(i).size(); j++) {
 					values[j] = rowsFetch.getString(j + 1);
 				}
 				rowsArrays.get(i).add(values);

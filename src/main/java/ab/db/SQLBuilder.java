@@ -41,7 +41,8 @@ public class SQLBuilder {
 		return sql;
 	}
 
-	public static String updateRow(String tableName, String[] columns, String[] values, String[] oldValues) {
+	public static String updateRow(String tableName, String[] columns, String[] values, String[] tableColumns,
+			String[] oldValues) {
 		String sql = null;
 
 		// Updating the values in the data base
@@ -53,8 +54,8 @@ public class SQLBuilder {
 
 		stringBuilding = stringBuilding.substring(0, stringBuilding.length() - 1) + " WHERE ";
 
-		for (int i = 0; i < columns.length; i++)
-			stringBuilding += columns[i] + " = '" + oldValues[i] + "' AND ";
+		for (int i = 0; i < tableColumns.length; i++)
+			stringBuilding += tableColumns[i] + " = '" + oldValues[i] + "' AND ";
 
 		sql = stringBuilding.substring(0, stringBuilding.length() - 5);
 
@@ -63,14 +64,14 @@ public class SQLBuilder {
 
 	public static String deleteRow(Table table, int rowIndex) {
 		String sql = null;
-		String[] columns = table.getColumns();
+		ArrayList<String> columns = table.getColumns();
 		ArrayList<String[]> values = table.getRows();
 
 		// Updating the data structure in the data base
 		String sqlBuilding = "DELETE FROM " + table.getName() + " WHERE ";
 
-		for (int i = 0; i < columns.length; i++)
-			sqlBuilding += columns[i] + " = '" + values.get(rowIndex)[i] + "' AND ";
+		for (int i = 0; i < columns.size(); i++)
+			sqlBuilding += columns.get(i) + " = '" + values.get(rowIndex)[i] + "' AND ";
 
 		sql = sqlBuilding.substring(0, sqlBuilding.length() - 5);
 
