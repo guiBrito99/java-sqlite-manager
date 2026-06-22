@@ -18,59 +18,53 @@ public class DatabaseController {
 		this.tableManager.printTables();
 	}
 
-	public void createTable() {
-		Object[] result = this.tableManager.createTable();
-		String tableName = (String) result[0];
-		String[] columns = (String[]) result[1];
-
+	public void createTable(String tableName, String[] columns) {
+		this.tableManager.createTable(tableName, columns);
 		String sql = SQLBuilder.createTableSQL(tableName, columns);
 		this.dataGateway.runSQL(sql);
 	}
 
-	public void deleteTable() {
-		String tableName = this.tableManager.deleteTable();
-		if (tableName != null) {
-			String sql = SQLBuilder.deleteTable(tableName);
-			this.dataGateway.runSQL(sql);
-		}
+	public void deleteTable(String tableName) {
+		this.tableManager.deleteTable(tableName);
+		String sql = SQLBuilder.deleteTable(tableName);
+		this.dataGateway.runSQL(sql);
 	}
 
-	public void insertRow() {
-		Object[] result = this.tableManager.insertRow();
-		if (result != null) {
-			String tableName = (String) result[0];
-			String[] columns = (String[]) result[1];
-			String[] values = (String[]) result[2];
-
-			String sql = SQLBuilder.insertRow(tableName, columns, values);
-			this.dataGateway.runSQL(sql);
-		}
+	public String[] getTablesNames() {
+		return this.tableManager.getTablesNames();
 	}
 
-	public void updateRow() {
-		Object[] result = this.tableManager.updateRow();
-		if (result != null) {
-			String tableName = (String) result[0];
-			String[] columns = (String[]) result[1];
-			String[] values = (String[]) result[2];
-			String[] tableColumns = (String[]) result[3];
-			String[] oldValues = (String[]) result[4];
-
-			String sql = SQLBuilder.updateRow(tableName, columns, values, tableColumns, oldValues);
-
-			this.dataGateway.runSQL(sql);
-		}
+	public String[] getTableColumns(String tableName) {
+		return this.tableManager.getTableColumns(tableName);
 	}
 
-	public void deleteRow() {
-		Object[] result = this.tableManager.deleteRow();
-		if (result != null) {
-			Table table = (Table) result[0];
-			int rowIndex = (int) result[1];
+	public String[][] getValuesMatrix(String tableName) {
+		return this.tableManager.getValuesMatrix(tableName);
+	}
 
-			String sql = SQLBuilder.deleteRow(table, rowIndex);
-			this.dataGateway.runSQL(sql);
-		}
+	public String[] getRowValues(String tableName, int rowIndex) {
+		return this.tableManager.getRowValues(tableName, rowIndex);
+	}
+
+	public void insertRow(String tableName, String[] columns, String[] values) {
+		this.tableManager.insertRow(tableName, columns, values);
+		String sql = SQLBuilder.insertRow(tableName, columns, values);
+		this.dataGateway.runSQL(sql);
+	}
+
+	public void updateRow(String tableName, String[] columns, String[] values, String[] tableColumns,
+			String[] oldValues, int rowIndex) {
+		this.tableManager.updateRow(tableName, rowIndex, columns, values);
+		String sql = SQLBuilder.updateRow(tableName, columns, values, tableColumns, oldValues);
+		this.dataGateway.runSQL(sql);
+	}
+
+	public void deleteRow(String tableName, int rowIndex) {
+		String[] columns = this.tableManager.getTableColumns(tableName);
+		String[] values = this.tableManager.getRowValues(tableName, rowIndex);
+		this.tableManager.deleteRow(tableName, rowIndex);
+		String sql = SQLBuilder.deleteRow(tableName, columns, values);
+		this.dataGateway.runSQL(sql);
 	}
 
 }

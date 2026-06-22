@@ -1,7 +1,5 @@
 package ab.db;
 
-import java.util.ArrayList;
-
 public class SQLBuilder {
 
 	public static String createTableSQL(String tableName, String[] columns) {
@@ -65,16 +63,17 @@ public class SQLBuilder {
 		return sql;
 	}
 
-	public static String deleteRow(Table table, int rowIndex) {
+	public static String deleteRow(String tableName, String[] columns, String[] values) {
 		String sql = null;
-		ArrayList<String> columns = table.getColumns();
-		ArrayList<String[]> values = table.getRows();
 
 		// Updating the data structure in the data base
-		String sqlBuilding = "DELETE FROM " + table.getName() + " WHERE ";
+		String sqlBuilding = "DELETE FROM " + tableName + " WHERE ";
 
-		for (int i = 0; i < columns.size(); i++)
-			sqlBuilding += columns.get(i) + " = '" + values.get(rowIndex)[i] + "' AND ";
+		for (int i = 0; i < columns.length; i++)
+			if(values[i] == null)
+				sqlBuilding += columns[i] + " IS NULL AND ";
+			else
+				sqlBuilding += columns[i] + " = '" + values[i] + "' AND ";
 
 		sql = sqlBuilding.substring(0, sqlBuilding.length() - 5);
 
