@@ -52,14 +52,17 @@ public class SQLBuilder {
 
 		stringBuilding = stringBuilding.substring(0, stringBuilding.length() - 1) + " WHERE ";
 
-		for (int i = 0; i < tableColumns.length; i++)
+		for (int i = 0; i < tableColumns.length; i++) {
 			if (oldValues[i] == null)
 				stringBuilding += tableColumns[i] + " IS NULL AND ";
 			else
 				stringBuilding += tableColumns[i] + " = '" + oldValues[i] + "' AND ";
+		}
 
 		sql = stringBuilding.substring(0, stringBuilding.length() - 5);
 
+		System.out.println(sql);
+		
 		return sql;
 	}
 

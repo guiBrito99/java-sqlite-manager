@@ -87,33 +87,43 @@ public class View {
 		String tableName = null;
 		String[] columns = null;
 		// Table name creator
+		System.out.println("Table creation");
 		do {
 			System.out.println("Table name:");
 
 			tableName = scanner.nextLine();
 
-			System.out.println("Table name is " + tableName);
+			if (!tableName.isBlank() && tableName.matches("^[a-zA-Z0-9]+$"))
+				System.out.println("Table name is " + tableName);
 
-			/*
-			 * To avoid confusion(table name empty, returning directly to the beginning of
-			 * the loop), only prints the confirm prompt if tableName is valid
-			 */
-		} while (tableName.isBlank() || !inputValidation("Confirm y/n"));
+		} while (tableName.isBlank() || !tableName.matches("^[a-zA-Z0-9]+$") || !inputValidation("Confirm y/n"));
 
 		// Table columns creator
 		String command;
+		boolean valid = true;
 		do {
+
 			System.out.println("Table columns, separated by comma:");
 
 			command = scanner.nextLine();
 
-			if (command != "") {
+			if (!command.isBlank()) {
 				columns = command.split(",");
+				if (columns.length != 0) {
+					int index = 0;
+					valid = true;
+					while (index < columns.length && valid) {
+						String column = columns[index];
+						valid = column.matches("^[a-zA-Z0-9]+$");
+						index++;
+					}
 
-				System.out.println("Columns: " + Arrays.toString(columns));
+					if (valid)
+						System.out.println("Columns: " + Arrays.toString(columns));
+				}
 			}
 
-		} while (command == "" || !inputValidation("Confirm y/n"));
+		} while (command.isBlank() || columns.length == 0 || !valid || !inputValidation("Confirm y/n"));
 
 		databaseController.createTable(tableName, columns);
 
@@ -121,46 +131,60 @@ public class View {
 
 	private static void deleteTable(DatabaseController databaseController) {
 		String[] tablesNames = databaseController.getTablesNames();
-		String tableName = selectTable("Select table for deletion:", tablesNames);
-		databaseController.deleteTable(tableName);
+		if (tablesNames != null) {
+			String tableName = selectTable("Select table for deletion:", tablesNames);
+			databaseController.deleteTable(tableName);
+		}
 	}
 
 	private static void insertRow(DatabaseController databaseController) {
 		String[] tablesNames = databaseController.getTablesNames();
-		String tableName = selectTable("Select table to insert", tablesNames);
-
-		String[] tableColumns = databaseController.getTableColumns(tableName);
-		String[] columns = selectColumns("Select the column(s) for the insertion, separating by coma", tableColumns);
-
-		String[] values = selectValues("Select the value(s) for each column(s)", columns);
-
-		databaseController.insertRow(tableName, columns, values);
+		if(tablesNames != null) {
+			String tableName = selectTable("Select table to insert", tablesNames);
+	
+			String[] tableColumns = databaseController.getTableColumns(tableName);
+			String[] columns = selectColumns("Select the column(s) for the insertion, separating by coma", tableColumns);
+	
+			String[] values = selectValues("Select the value(s) for each column(s)", columns);
+	
+			databaseController.insertRow(tableName, columns, values);
+		}else
+			System.out.println("Option unavailable");
 	}
-
 	private static void deleteRow(DatabaseController databaseController) {
 		String[] tablesNames = databaseController.getTablesNames();
-		String tableName = selectTable("Select table to remove one row", tablesNames);
-
-		String[] columns = databaseController.getTableColumns(tableName);
-		String[][] valuesMatrix = databaseController.getValuesMatrix(tableName);
-		int rowIndex = selectRow("Select the row to delete", columns, valuesMatrix);
-
-		databaseController.deleteRow(tableName, rowIndex);
-	}
+		if (tablesNames != null) {
+			String tableName = selectTable("Select table to remove one row", tablesNames);
+			String[][] valuesMatrix = databaseController.getValuesMatrix(tableName);
+			if(valuesMatrix.length != 0) {
+				String[] columns = databaseController.getTableColumns(tableName);
+				int rowIndex = selectRow("Select the row to delete", columns, valuesMatrix);
 	
+				databaseController.deleteRow(tableName, rowIndex);
+			}else
+				System.out.println("Option unavailable");
+		}else
+			System.out.println("Option unavailable");
+	}
+
 	private static void updateRow(DatabaseController databaseController) {
 		String[] tablesNames = databaseController.getTablesNames();
-		String tableName = selectTable("Select table to update", tablesNames);
-		
-		String[] tableColumns = databaseController.getTableColumns(tableName);
-		String[][] valuesMatrix = databaseController.getValuesMatrix(tableName);
-		int rowIndex = selectRow("Select the row for the update", tableColumns, valuesMatrix);
-		String[] oldValues = databaseController.getRowValues(tableName, rowIndex);
-		
-		String[] columns = selectColumns("Select column(s) to update, separating by coma", tableColumns);
-		String[] values = selectValues("Select value(s) for each column(s)", columns);
+		if (tablesNames != null) {
+			String tableName = selectTable("Select table to update", tablesNames);
+			String[][] valuesMatrix = databaseController.getValuesMatrix(tableName);
+			if (valuesMatrix.length != 0) {
+				String[] tableColumns = databaseController.getTableColumns(tableName);
+				int rowIndex = selectRow("Select the row for the update", tableColumns, valuesMatrix);
+				String[] oldValues = databaseController.getRowValues(tableName, rowIndex);
 
-		databaseController.updateRow(tableName, columns, values, tableColumns, oldValues, rowIndex);
+				String[] columns = selectColumns("Select column(s) to update, separating by coma", tableColumns);
+				String[] values = selectValues("Select value(s) for each column(s)", columns);
+
+				databaseController.updateRow(tableName, columns, values, tableColumns, oldValues, rowIndex);
+			} else
+				System.out.println("Option unavailable");
+		}else
+			System.out.println("Option unavailable");
 	}
 
 	private static String selectTable(String message, String[] tablesNames) {
@@ -222,22 +246,24 @@ public class View {
 			selectedIndexes.addAll(indexSelection);
 			selectedIndexes.sort(Comparator.reverseOrder());
 
-			while (selectedIndexes.getFirst() > availableColumns.length) {
+			while (!selectedIndexes.isEmpty() && (selectedIndexes.getFirst() > availableColumns.length || selectedIndexes.getFirst() < 0)) {
 				selectedIndexes.removeFirst();
 			}
 
-			if (selectedIndexes.getFirst() == availableColumns.length)
-				selectedIndexes.subList(1, selectedIndexes.size()).clear();
+			if (!selectedIndexes.isEmpty()) {
+				if (selectedIndexes.getFirst() == availableColumns.length)
+					selectedIndexes.subList(1, selectedIndexes.size()).clear();
 
-			selectedIndexes.sort(Comparator.naturalOrder());
+				selectedIndexes.sort(Comparator.naturalOrder());
 
-			String selectionOutput = "Selection: ";
+				String selectionOutput = "Selection: ";
 
-			for (int index : selectedIndexes)
-				selectionOutput += availableColumns.length == index ? "All columns " : availableColumns[index] + " ";
+				for (int index : selectedIndexes)
+					selectionOutput += availableColumns.length == index ? "All columns "
+							: availableColumns[index] + " ";
 
-			System.out.println(selectionOutput.substring(0, selectionOutput.length() - 1));
-
+				System.out.println(selectionOutput.substring(0, selectionOutput.length() - 1));
+			}
 		} while (selectedIndexes.isEmpty() || !inputValidation("Confirm y/n"));
 
 		if (selectedIndexes.getFirst() == availableColumns.length)
@@ -269,7 +295,7 @@ public class View {
 		return values;
 	}
 
-	private static int selectRow(String message, String[] columns ,String[][] valuesMatrix) {
+	private static int selectRow(String message, String[] columns, String[][] valuesMatrix) {
 		int row = -1;
 		boolean valid = false;
 
@@ -317,12 +343,12 @@ public class View {
 			System.out.println(message);
 			command = View.scanner.nextLine().toLowerCase();
 
-			if (command == "")
+			if (command.isBlank())
 				System.out.println("Type in valid character");
 			else
 				firstChar = command.charAt(0);
 
-		} while (command == "" || (firstChar != 'y' && firstChar != 'n'));
+		} while (command.isBlank() || (firstChar != 'y' && firstChar != 'n'));
 
 		confirm = firstChar == 'y';
 

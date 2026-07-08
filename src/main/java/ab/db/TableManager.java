@@ -120,7 +120,8 @@ public class TableManager {
 			tableNames = new String[this.tables.size()];
 			for (int i = 0; i < this.tables.size(); i++)
 				tableNames[i] = this.tables.get(i).getName();
-		}
+		}else
+			System.out.println("No table in the database");
 
 		return tableNames;
 	}

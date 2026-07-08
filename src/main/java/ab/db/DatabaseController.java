@@ -54,9 +54,9 @@ public class DatabaseController {
 
 	public void updateRow(String tableName, String[] columns, String[] values, String[] tableColumns,
 			String[] oldValues, int rowIndex) {
-		this.tableManager.updateRow(tableName, rowIndex, columns, values);
 		String sql = SQLBuilder.updateRow(tableName, columns, values, tableColumns, oldValues);
 		this.dataGateway.runSQL(sql);
+		this.tableManager.updateRow(tableName, rowIndex, columns, values);
 	}
 
 	public void deleteRow(String tableName, int rowIndex) {
