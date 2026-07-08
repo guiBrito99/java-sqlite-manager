@@ -60,8 +60,6 @@ public class SQLBuilder {
 		}
 
 		sql = stringBuilding.substring(0, stringBuilding.length() - 5);
-
-		System.out.println(sql);
 		
 		return sql;
 	}
