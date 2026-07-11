@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Scanner;
 
 public class View {
@@ -13,19 +12,90 @@ public class View {
 
 	public static void main(String... args) throws SQLException {
 		DatabaseController databaseController = new DatabaseController();
-		if (args.length == 0) {
-			databaseMenu(databaseController);
-		} else {
-			ArrayList<String> arguments = new ArrayList<>(List.of(args));
 
-			for (String argument : arguments) {
-				switch (argument.toLowerCase()) {
-				case "--print":
+		try {
+			if (args.length == 0) {
+				databaseMenu(databaseController);
+			} else {
+
+				switch (args[0]) {
+				case "print":
 					databaseController.print();
 					break;
+
+				case "create":
+
+					if (args.length == 3) {
+						String tableName = args[1];
+						String[] columns = args[2].split(",");
+
+						databaseController.createTable(tableName, columns);
+					} else
+						System.out.println("Invalid arguments");
+
+					break;
+
+				case "drop":
+
+					if (args.length == 2) {
+						String tableName = args[1];
+
+						databaseController.deleteTable(tableName);
+					} else
+						System.out.println("Invalid arguments");
+
+					break;
+
+				case "insert":
+
+					if (args.length == 4) {
+						String tableName = args[1];
+						String[] columns = args[2].split(",");
+						String[] values = args[3].split(",");
+
+						databaseController.insertRow(tableName, columns, values);
+					} else
+						System.out.println("Invalid arguments");
+
+					break;
+
+				case "delete":
+
+					if (args.length == 3) {
+						String tableName = args[1];
+						int rowIndex = Integer.parseInt(args[2]);
+
+						databaseController.deleteRow(tableName, rowIndex);
+					} else
+						System.out.println("Invalid arguments");
+
+					break;
+
+				case "update":
+
+					if (args.length == 5) {
+						String tableName = args[1];
+						int rowIndex = Integer.parseInt(args[2]);
+						String[] columns = args[3].split(",");
+						String[] values = args[4].split(",");
+						String[] tableColumns = databaseController.getTableColumns(tableName);
+						String[] oldValues = databaseController.getRowValues(tableName, rowIndex);
+
+						databaseController.updateRow(tableName, columns, values, tableColumns, oldValues, rowIndex);
+
+					} else
+						System.out.println("Invalid arguments");
+
+					break;
+
 				default:
+					System.out.println("Unknow command");
+
 				}
+
 			}
+		} finally {
+			databaseController.close();
 		}
 
 	}

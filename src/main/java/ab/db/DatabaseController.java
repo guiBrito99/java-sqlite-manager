@@ -13,6 +13,16 @@ public class DatabaseController {
 		this.dataGateway = new DataGateway(connection);
 		this.tableManager = new TableManager(dataGateway.load());
 	}
+	
+	public void close() {
+	    try {
+	        if (this.connection != null && !this.connection.isClosed()) {
+	            this.connection.close();
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Error closing database: " + e.getMessage());
+	    }
+	}
 
 	public void print() {
 		this.tableManager.printTables();
