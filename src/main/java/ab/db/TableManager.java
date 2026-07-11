@@ -88,23 +88,26 @@ public class TableManager {
 				}
 
 				// Build header row
-				String header = "|";
-				String separator = "|";
+				StringBuilder header = new StringBuilder("|");
+				StringBuilder separator = new StringBuilder("|");
 				for (int i = 0; i < columns.size(); i++) {
-					header += String.format(" %-" + columnWidths[i] + "s |", columns.get(i));
-					separator += " " + "-".repeat(columnWidths[i]) + " |";
+					header.append(String.format(" %-" + columnWidths[i] + "s |", columns.get(i)));
+					separator.append(" ").append("-".repeat(columnWidths[i])).append(" |");
 				}
-				System.out.println(header);
-				System.out.println(separator);
+
+				System.out.println(header.toString());
+				System.out.println(separator.toString());
 
 				// Build data rows
 				for (String[] row : rows) {
-					String line = "|";
+					StringBuilder line = new StringBuilder("|");
+					StringBuilder cell = new StringBuilder();
 					for (int i = 0; i < columns.size(); i++) {
-						String cell = (i < row.length && row[i] != null) ? row[i] : "";
-						line += String.format(" %-" + columnWidths[i] + "s |", cell);
+						cell.setLength(0);
+						cell.append((row[i] != null) ? row[i] : "");
+						line.append(String.format(" %-" + columnWidths[i] + "s |", cell));
 					}
-					System.out.println(line);
+					System.out.println(line.toString());
 				}
 
 				System.out.println();

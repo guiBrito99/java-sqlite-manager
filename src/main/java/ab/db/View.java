@@ -45,12 +45,11 @@ public class View {
 			System.out.println("0 - Exit");
 
 			try {
-				command = View.scanner.nextInt();
+				command = Integer.parseInt(getInput());
 			} catch (Exception e) {
 				System.out.println("Type in valid integer");
 				command = -1;
 			}
-			scanner.nextLine();
 
 			switch (command) {
 			case 1:
@@ -91,7 +90,7 @@ public class View {
 		do {
 			System.out.println("Table name:");
 
-			tableName = scanner.nextLine();
+			tableName = getInput();
 
 			if (!tableName.isBlank() && tableName.matches("^[a-zA-Z0-9]+$"))
 				System.out.println("Table name is " + tableName);
@@ -105,7 +104,7 @@ public class View {
 
 			System.out.println("Table columns, separated by comma:");
 
-			command = scanner.nextLine();
+			command = getInput();
 
 			if (!command.isBlank()) {
 				columns = command.split(",");
@@ -201,8 +200,7 @@ public class View {
 				System.out.println(i + " - " + tablesNames[i]);
 
 			try {
-				selection = scanner.nextInt();
-				scanner.nextLine();
+				selection = Integer.parseInt(getInput());
 				valid = selection >= 0 && selection < tablesNames.length;
 			} catch (Exception e) {
 				System.out.println("Type in valid integer");
@@ -231,7 +229,7 @@ public class View {
 
 			System.out.println(availableColumns.length + " - Select all columns");
 
-			selection = scanner.nextLine().split(",");
+			selection = getInput().split(",");
 
 			selectedIndexes.clear();
 			indexSelection.clear();
@@ -246,12 +244,8 @@ public class View {
 
 			// Now adding all values to the ArrayList to perform modifications
 			selectedIndexes.addAll(indexSelection);
-			selectedIndexes.sort(Comparator.reverseOrder());
 
-			while (!selectedIndexes.isEmpty()
-					&& (selectedIndexes.getFirst() > availableColumns.length || selectedIndexes.getFirst() < 0)) {
-				selectedIndexes.removeFirst();
-			}
+			selectedIndexes.removeIf(index -> index > availableColumns.length || index < 0);
 
 			if (!selectedIndexes.isEmpty()) {
 				if (selectedIndexes.getFirst() == availableColumns.length)
@@ -286,7 +280,7 @@ public class View {
 			System.out.println(message);
 			for (int i = 0; i < columns.length; i++) {
 				System.out.print(columns[i] + ": ");
-				values[i] = scanner.nextLine();
+				values[i] = getInput();
 			}
 
 			System.out.println("Selected values:");
@@ -304,18 +298,45 @@ public class View {
 
 		do {
 			System.out.println(message);
-			String rowString = null;
-			for (int i = 0; i < valuesMatrix.length; i++) {
-				rowString = i + " - ";
-				for (int j = 0; j < columns.length; j++)
-					rowString += "(" + columns[j] + ")" + valuesMatrix[i][j] + " ";
 
-				System.out.println(rowString.substring(0, rowString.length() - 1));
+			int[] columnWidths = new int[columns.length];
+			for (int i = 0; i < columns.length; i++) {
+				columnWidths[i] = columns[i].length();
+			}
+			for (String[] values : valuesMatrix) {
+				for (int i = 0; i < values.length; i++) {
+					if (values[i] != null && (values[i].length() > columnWidths[i])) {
+						columnWidths[i] = values[i].length();
+					}
+				}
+			}
+
+			StringBuilder header = new StringBuilder("    |");
+			StringBuilder separator = new StringBuilder("    |");
+			for (int i = 0; i < columns.length; i++) {
+				header.append(String.format(" %-" + columnWidths[i] + "s |", columns[i]));
+				separator.append(" ").append("-".repeat(columnWidths[i])).append(" |");
+			}
+
+			System.out.println(header.toString());
+			System.out.println(separator.toString());
+
+			StringBuilder[] lines = new StringBuilder[valuesMatrix.length];
+
+			for (int i = 0; i < valuesMatrix.length; i++) {
+				StringBuilder line = new StringBuilder(i + " - |");
+				StringBuilder cell = new StringBuilder();
+				for (int j = 0; j < columns.length; j++) {
+					cell.setLength(0);
+					cell.append((valuesMatrix[i][j] != null) ? valuesMatrix[i][j] : "");
+					line.append(String.format(" %-" + columnWidths[j] + "s |", cell));
+				}
+				System.out.println(line.toString());
+				lines[i] = new StringBuilder(line.toString());
 			}
 
 			try {
-				row = scanner.nextInt();
-				scanner.nextLine();
+				row = Integer.parseInt(getInput());
 				valid = row >= 0 && row < valuesMatrix.length;
 			} catch (Exception e) {
 				System.out.println("Type in valid integer");
@@ -324,12 +345,7 @@ public class View {
 
 			if (valid) {
 				System.out.println("Selected row:");
-
-				rowString = row + " - ";
-				for (int j = 0; j < columns.length; j++)
-					rowString += "(" + columns[j] + ")" + valuesMatrix[row][j] + " ";
-
-				System.out.println(rowString.substring(0, rowString.length() - 1));
+				System.out.println(lines[row].toString());
 			}
 
 		} while (!valid || !inputValidation("Confirm y/n"));
@@ -344,7 +360,7 @@ public class View {
 
 		do {
 			System.out.println(message);
-			command = View.scanner.nextLine().toLowerCase();
+			command = getInput().toLowerCase();
 
 			if (command.isBlank())
 				System.out.println("Type in valid character");
@@ -357,4 +373,15 @@ public class View {
 
 		return confirm;
 	}
+
+	private static String getInput() {
+
+		if (!scanner.hasNextLine()) {
+			System.out.println("\nTerminal stream closed. Exiting safely...");
+			System.exit(0);
+		}
+
+		return scanner.nextLine();
+	}
+
 }
