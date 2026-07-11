@@ -9,46 +9,73 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * The ViewTest class acts as an automated integration suite for the application.
+ * Because the View class relies on Scanner (System.in), this test suite mocks the 
+ * user's keyboard input by piping custom strings into the standard input stream.
+ * It simulates a full CRUD lifecycle and validates robustness against invalid inputs.
+ */
 public class ViewTest {
 
 	// Save the real keyboard input so we can restore it later
 	private final InputStream originalSystemIn = System.in;
+	// Buffer to collect all test inputs before executing the program
 	private StringBuilder testString = new StringBuilder();
 
+	/**
+	 * Queues a string to be "typed" by the user during the test.
+	 * 
+	 * @param input The command or value to simulate.
+	 */
 	private void addTest(String input) throws SQLException {
 		this.testString.append(input);
 	}
 
+	/**
+	 * The execution engine: converts the accumulated test buffer into a Byte Stream
+	 * and pipes it into System.in, then launches the application.
+	 */
 	private void execute() throws Exception {
 		System.out.println(this.testString);
 		ByteArrayInputStream fakeKeyboard = new ByteArrayInputStream(this.testString.toString().getBytes());
 		System.setIn(fakeKeyboard);
+		// Reset the scanner to read from our mocked stream
 		View.scanner = new Scanner(System.in);
 
 		View.main();
 	}
 
+	/**
+	 * Cleanup hook: Runs AFTER every test to restore the actual keyboard (System.in).
+	 * This is critical; otherwise, the JUnit runner would lose its own input stream!
+	 */
 	@AfterEach
 	public void tearDown() {
-		// This runs AFTER every test to clean up.
-		// We put the real keyboard back so we don't break the rest of the application!
 		System.setIn(originalSystemIn);
 		View.scanner = new Scanner(System.in);
 	}
 
+	/**
+	 * The primary integration test. It simulates a user's full journey:
+	 * 1. Testing error handling (invalid inputs).
+	 * 2. Creating tables.
+	 * 3. Inserting data.
+	 * 4. Updating data.
+	 * 5. Deleting data and dropping tables.
+	 */
 	@Test
 	public void fullTest() throws Exception {
-		//Testing the menu loop logic
+		// Testing the menu loop logic
 		this.testMenuInvalidInput();
 		
-		// Tests done while the database is empty
+		// Tests done while the database is empty (ensures "Option unavailable" handling)
 		this.testMenuPrint();
 		this.testMenuDeleteTable(null, null);
 		this.testMenuInsertRow(null, null, null, null);
 		this.testMenuDeleteRow(null, null, null);
 		this.testMenuUpdateRow(null, null, null, null, null);
 
-		// Now properly creating a table and testing the program
+		// Initialize test data objects for a valid run
 		ArrayList<String> tablesNames = new ArrayList<>();
 		ArrayList<String[]> tablesColumns = new ArrayList<>();
 		ArrayList<ArrayList<String[]>> tableValidInputs = new ArrayList<>();
@@ -62,6 +89,7 @@ public class ViewTest {
 		tableValidInputs.add(new ArrayList<>());
 		tableValidInputs.get(0).add(testInputs.get(0));
 		
+		// Run the full CRUD operational cycle
 		this.testMenuCreateTable(tablesNames.get(0), tablesColumns.get(0));
 		this.testMenuPrint();
 		this.testMenuDeleteTable(tablesNames, tablesNames.get(0));
@@ -85,9 +113,10 @@ public class ViewTest {
 		this.testMenuDeleteTable(tablesNames, tablesNames.get(0));
 		this.testMenuPrint();
 		
+		// Finalize simulation
 		this.testMenuExit();
 
-		
+		// Trigger the execution of the buffered commands
 		this.execute();
 	}
 
@@ -134,22 +163,20 @@ public class ViewTest {
 	}
 
 	private void testCreateTable(String tableName, String[] tableColumns) throws Exception {
-
 		this.testNegatedInput();
-
 		this.testInvalidStrings();
 
+		// Input name and confirm
 		this.addTest(tableName + "\ny\n");
 
+		// Build column string
 		StringBuilder testColumns = new StringBuilder();
-
 		for (String column : tableColumns)
 			testColumns.append(column).append(",");
 
 		testColumns.deleteCharAt(testColumns.length() - 1);
 
 		this.addTest(testColumns.toString());
-
 		this.addTest("\ny\n");
 	}
 
@@ -179,64 +206,41 @@ public class ViewTest {
 	}
 
 	private void testSelectTable(int correctInput) throws Exception {
-		// Testing the invalid input
 		this.testInvalidNumberSelection(correctInput);
-
-		// Selecting the table
 		this.addTest(correctInput + "\n");
-
-		// Testing confirmation
 		this.testInvalidCharactersConfirmation();
-
-		// Confirming the table to deletion
 		this.addTest("y\n");
 	}
 
 	private void testSelectColumns(String[] tableColumns) throws Exception {
-		// Testing all but the correct value
 		this.testInvalidNumberSelection((tableColumns.length) - 1);
+		this.addTest("0\nn\n"); // Selecting/negating column
+		this.addTest(tableColumns.length + "\n"); // Selecting all
 
-		// Selecting column to negate afterwards
-		this.addTest("0\nn\n");
-
-		// Selecting the right option
-		this.addTest(tableColumns.length + "\n"); 
-
-		// Testing confirmation
 		this.testInvalidCharactersConfirmation();
-
-		// Confirming column selection
 		this.addTest("y\n");
 	}
 
 	private void testSelectValues(String[] tableColumns, String[] validInputs) throws Exception {
-		// Selecting values to negate
+		// Fill with invalid data first to trigger error handling
 		int columnsSize = tableColumns.length;
 		for (int i = 0; i < columnsSize; i++)
 			this.addTest("Invalid " + i + "\n");
 		this.addTest("n\n");
 
-		// Adding valid inputs
+		// Add valid inputs
 		for (int i = 0; i < columnsSize; i++)
 			this.addTest(validInputs[i] + "\n");
 
 		this.testInvalidCharactersConfirmation();
-
 		this.addTest("y\n");
 	}
 
 	private void testSelectRow(ArrayList<String[]> rows) throws Exception {
 		int validOption = rows.size() - 1;
-
-		// Testing invalid options
 		this.testInvalidNumberSelection(validOption);
-
-		// Selecting the valid option
 		this.addTest(validOption + "\n");
-
-		// Testing confirmation
 		this.testInvalidCharactersConfirmation();
-
 		this.addTest("y\n");
 	}
 
@@ -259,15 +263,16 @@ public class ViewTest {
 
 	private void testInvalidCharactersConfirmation() throws Exception {
 		StringBuilder simulatedInput = new StringBuilder();
-
+		// Attempt to input non y/n characters
 		for (int i = 32; i < 127; i++)
-			if (i != ((char) 'y')  && i != ((char) 'n') && i != ((char) 'Y') && i != ((char) 'N'))
+			if (i != ((char) 'y') && i != ((char) 'n') && i != ((char) 'Y') && i != ((char) 'N'))
 				simulatedInput.append((char) i).append("\n");
 
 		this.addTest(simulatedInput.toString());
 	}
 
 	private void testInvalidNumberSelection(int columnsSize) throws Exception {
+		// Spam invalid numeric inputs
 		for (int i = -10; i <= 10; i++)
 			if (!(i >= 0 && i <= (columnsSize+1)))
 				this.addTest(i + "\n");
@@ -275,12 +280,10 @@ public class ViewTest {
 
 	private void testMenuInvalidInput() throws Exception {
 		StringBuilder simulatedInput = new StringBuilder();
-
-		// Testing chars
+		// Test characters
 		for (int i = 32; i < 127; i++)
 			simulatedInput.append((char) i).append("\n");
-
-		// Testing numbers
+		// Test numbers
 		for (int i = 7; i < 100; i++)
 			simulatedInput.append(i).append("\n");
 	}
