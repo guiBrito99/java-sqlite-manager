@@ -139,31 +139,33 @@ public class View {
 
 	private static void insertRow(DatabaseController databaseController) {
 		String[] tablesNames = databaseController.getTablesNames();
-		if(tablesNames != null) {
+		if (tablesNames != null) {
 			String tableName = selectTable("Select table to insert", tablesNames);
-	
+
 			String[] tableColumns = databaseController.getTableColumns(tableName);
-			String[] columns = selectColumns("Select the column(s) for the insertion, separating by coma", tableColumns);
-	
+			String[] columns = selectColumns("Select the column(s) for the insertion, separating by coma",
+					tableColumns);
+
 			String[] values = selectValues("Select the value(s) for each column(s)", columns);
-	
+
 			databaseController.insertRow(tableName, columns, values);
-		}else
+		} else
 			System.out.println("Option unavailable");
 	}
+
 	private static void deleteRow(DatabaseController databaseController) {
 		String[] tablesNames = databaseController.getTablesNames();
 		if (tablesNames != null) {
 			String tableName = selectTable("Select table to remove one row", tablesNames);
 			String[][] valuesMatrix = databaseController.getValuesMatrix(tableName);
-			if(valuesMatrix.length != 0) {
+			if (valuesMatrix.length != 0) {
 				String[] columns = databaseController.getTableColumns(tableName);
 				int rowIndex = selectRow("Select the row to delete", columns, valuesMatrix);
-	
+
 				databaseController.deleteRow(tableName, rowIndex);
-			}else
+			} else
 				System.out.println("Option unavailable");
-		}else
+		} else
 			System.out.println("Option unavailable");
 	}
 
@@ -183,7 +185,7 @@ public class View {
 				databaseController.updateRow(tableName, columns, values, tableColumns, oldValues, rowIndex);
 			} else
 				System.out.println("Option unavailable");
-		}else
+		} else
 			System.out.println("Option unavailable");
 	}
 
@@ -246,7 +248,8 @@ public class View {
 			selectedIndexes.addAll(indexSelection);
 			selectedIndexes.sort(Comparator.reverseOrder());
 
-			while (!selectedIndexes.isEmpty() && (selectedIndexes.getFirst() > availableColumns.length || selectedIndexes.getFirst() < 0)) {
+			while (!selectedIndexes.isEmpty()
+					&& (selectedIndexes.getFirst() > availableColumns.length || selectedIndexes.getFirst() < 0)) {
 				selectedIndexes.removeFirst();
 			}
 

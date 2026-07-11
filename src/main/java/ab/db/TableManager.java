@@ -120,7 +120,7 @@ public class TableManager {
 			tableNames = new String[this.tables.size()];
 			for (int i = 0; i < this.tables.size(); i++)
 				tableNames[i] = this.tables.get(i).getName();
-		}else
+		} else
 			System.out.println("No table in the database");
 
 		return tableNames;
@@ -140,7 +140,7 @@ public class TableManager {
 	public String[][] getValuesMatrix(String tableName) {
 		Table table = this.findTable(tableName);
 		String[][] valuesMatrix = null;
-		
+
 		if (table != null) {
 			int rowsSize = table.getRows().size();
 			int columnsSize = table.getColumns().size();
@@ -162,9 +162,9 @@ public class TableManager {
 		String[] rowValues = null;
 		Table table = this.findTable(tableName);
 
-		if(table != null)
+		if (table != null)
 			rowValues = table.getRows().get(rowIndex);
-		
+
 		return rowValues;
 	}
 
