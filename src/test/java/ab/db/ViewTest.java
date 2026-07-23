@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * The ViewTest class acts as an automated integration suite for the application.
- * Because the View class relies on Scanner (System.in), this test suite mocks the 
- * user's keyboard input by piping custom strings into the standard input stream.
- * It simulates a full CRUD lifecycle and validates robustness against invalid inputs.
+ * The ViewTest class acts as an automated integration suite for the
+ * application. Because the View class relies on Scanner (System.in), this test
+ * suite mocks the user's keyboard input by piping custom strings into the
+ * standard input stream. It simulates a full CRUD lifecycle and validates
+ * robustness against invalid inputs.
  */
 public class ViewTest {
 
@@ -46,8 +47,9 @@ public class ViewTest {
 	}
 
 	/**
-	 * Cleanup hook: Runs AFTER every test to restore the actual keyboard (System.in).
-	 * This is critical; otherwise, the JUnit runner would lose its own input stream!
+	 * Cleanup hook: Runs AFTER every test to restore the actual keyboard
+	 * (System.in). This is critical; otherwise, the JUnit runner would lose its own
+	 * input stream!
 	 */
 	@AfterEach
 	public void tearDown() {
@@ -56,19 +58,17 @@ public class ViewTest {
 	}
 
 	/**
-	 * The primary integration test. It simulates a user's full journey:
-	 * 1. Testing error handling (invalid inputs).
-	 * 2. Creating tables.
-	 * 3. Inserting data.
-	 * 4. Updating data.
-	 * 5. Deleting data and dropping tables.
+	 * The primary integration test. It simulates a user's full journey: 1. Testing
+	 * error handling (invalid inputs). 2. Creating tables. 3. Inserting data. 4.
+	 * Updating data. 5. Deleting data and dropping tables.
 	 */
 	@Test
 	public void fullTest() throws Exception {
 		// Testing the menu loop logic
 		this.testMenuInvalidInput();
-		
-		// Tests done while the database is empty (ensures "Option unavailable" handling)
+
+		// Tests done while the database is empty (ensures "Option unavailable"
+		// handling)
 		this.testMenuPrint();
 		this.testMenuDeleteTable(null, null);
 		this.testMenuInsertRow(null, null, null, null);
@@ -88,31 +88,30 @@ public class ViewTest {
 		tablesColumns.add(new String[] { "Testing1", "Testing2" });
 		tableValidInputs.add(new ArrayList<>());
 		tableValidInputs.get(0).add(testInputs.get(0));
-		
+
 		// Run the full CRUD operational cycle
 		this.testMenuCreateTable(tablesNames.get(0), tablesColumns.get(0));
 		this.testMenuPrint();
 		this.testMenuDeleteTable(tablesNames, tablesNames.get(0));
 		this.testMenuPrint();
-		
+
 		this.testMenuCreateTable(tablesNames.get(0), tablesColumns.get(0));
 		this.testMenuPrint();
-		
+
 		this.testMenuInsertRow(tablesNames, tablesNames.get(0), tablesColumns.get(0), tableValidInputs.get(0).get(0));
 		this.testMenuPrint();
 		this.testMenuDeleteRow(tablesNames, tablesNames.get(0), tableValidInputs.get(0));
 		this.testMenuPrint();
 
-		
 		this.testMenuInsertRow(tablesNames, tablesNames.get(0), tablesColumns.get(0), tableValidInputs.get(0).get(0));
 		this.testMenuPrint();
 		this.testMenuUpdateRow(tablesNames, tablesNames.get(0), tablesColumns.get(0), tableValidInputs.get(0),
 				testInputs.getLast());
 		this.testMenuPrint();
-		
+
 		this.testMenuDeleteTable(tablesNames, tablesNames.get(0));
 		this.testMenuPrint();
-		
+
 		// Finalize simulation
 		this.testMenuExit();
 
@@ -126,20 +125,20 @@ public class ViewTest {
 
 	private void testMenuCreateTable(String tableName, String[] tableColumns) throws Exception {
 		this.addTest("2\n");
-		if(tableName != null && tableColumns != null)
+		if (tableName != null && tableColumns != null)
 			this.testCreateTable(tableName, tableColumns);
 	}
 
 	private void testMenuDeleteTable(ArrayList<String> tablesNames, String tableName) throws Exception {
 		this.addTest("3\n");
-		if(tablesNames != null && tableName != null)
+		if (tablesNames != null && tableName != null)
 			this.testDeleteTable(tablesNames, tableName);
 	}
 
 	private void testMenuInsertRow(ArrayList<String> tablesNames, String tableName, String[] tableColumns,
 			String[] validInputs) throws Exception {
 		this.addTest("4\n");
-		if(tablesNames != null && tableName != null && tableColumns != null && validInputs != null)
+		if (tablesNames != null && tableName != null && tableColumns != null && validInputs != null)
 			this.testInsertRow(tablesNames, tableName, tableColumns, validInputs);
 
 	}
@@ -147,14 +146,15 @@ public class ViewTest {
 	private void testMenuDeleteRow(ArrayList<String> tablesNames, String tableName,
 			ArrayList<String[]> tableValidInputs) throws Exception {
 		this.addTest("5\n");
-		if(tablesNames != null && tableName != null && tableValidInputs != null)
+		if (tablesNames != null && tableName != null && tableValidInputs != null)
 			this.testDeleteRow(tablesNames, tableName, tableValidInputs);
 	}
 
 	private void testMenuUpdateRow(ArrayList<String> tablesNames, String tableName, String[] tableColumns,
 			ArrayList<String[]> tableRows, String[] validInputs) throws Exception {
 		this.addTest("6\n");
-		if(tablesNames != null && tableName != null && tableColumns != null && tableRows != null && validInputs != null)
+		if (tablesNames != null && tableName != null && tableColumns != null && tableRows != null
+				&& validInputs != null)
 			this.testUpdateRow(tablesNames, tableName, tableRows, tableColumns, validInputs);
 	}
 
@@ -274,7 +274,7 @@ public class ViewTest {
 	private void testInvalidNumberSelection(int columnsSize) throws Exception {
 		// Spam invalid numeric inputs
 		for (int i = -10; i <= 10; i++)
-			if (!(i >= 0 && i <= (columnsSize+1)))
+			if (!(i >= 0 && i <= (columnsSize + 1)))
 				this.addTest(i + "\n");
 	}
 

@@ -1,6 +1,6 @@
-<project xmlns="https://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- ========================================== -->
@@ -9,6 +9,20 @@
 	<groupId>com.ab</groupId>
 	<artifactId>sql-manager</artifactId>
 	<version>1.0</version>
+
+	<!-- ========================================== -->
+	<!-- Global Properties                          -->
+	<!-- ========================================== -->
+	<properties>
+		<!-- Forces UTF-8 encoding across the project to prevent character
+		corruption -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Tells the Maven compiler to use modern Java instead of the default
+		1.8 -->
+		<maven.compiler.source>25</maven.compiler.source>
+		<maven.compiler.target>25</maven.compiler.target>
+	</properties>
 
 	<!-- ========================================== -->
 	<!-- Project Dependencies                       -->
@@ -20,14 +34,14 @@
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.45.1.0</version>
 		</dependency>
-		
+
 		<!-- Logback for structured logging (replacing System.out.println) -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.2.13</version>
 		</dependency>
-		
+
 		<!-- JUnit 5 API for the ViewTest simulation -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -41,11 +55,13 @@
 	<!-- Build Configuration                        -->
 	<!-- ========================================== -->
 	<build>
-		<!-- 1. MAGIC LINE: Explicitly forces the final output name, dropping the version number -->
+		<!-- 1. MAGIC LINE: Explicitly forces the final output name, dropping
+		the version number -->
 		<finalName>sqlite-manager-complete</finalName>
 
 		<plugins>
-			<!-- Exec Plugin: Allows you to run the app directly via 'mvn exec:java' -->
+			<!-- Exec Plugin: Allows you to run the app directly via 'mvn
+			exec:java' -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -53,7 +69,8 @@
 				<configuration>
 					<executable>java</executable>
 					<arguments>
-						<!-- Bypasses the JVM restriction for SQLite's native C libraries -->
+						<!-- Bypasses the JVM restriction for SQLite's native C
+						libraries -->
 						<argument>--enable-native-access=ALL-UNNAMED</argument>
 						<argument>-classpath</argument>
 						<classpath />
@@ -63,21 +80,25 @@
 				</configuration>
 			</plugin>
 
-			<!-- Assembly Plugin: Packages the code AND dependencies into a single runnable JAR -->
+			<!-- Assembly Plugin: Packages the code AND dependencies into a
+			single runnable JAR -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.6.0</version>
 				<configuration>
-					<!-- 2. Prevents Maven from appending the descriptor name to the finalName -->
+					<!-- 2. Prevents Maven from appending the descriptor name to
+					the finalName -->
 					<appendAssemblyId>false</appendAssemblyId>
 					<archive>
 						<manifest>
-							<!-- Defines the entry point when running 'java -jar' -->
+							<!-- Defines the entry point when running 'java
+							-jar' -->
 							<mainClass>ab.db.View</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
-						<!-- 3. Standard Maven descriptor to include all dependency JARs inside your JAR -->
+						<!-- 3. Standard Maven descriptor to include all
+						dependency JARs inside your JAR -->
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 				</configuration>
